@@ -141,6 +141,17 @@ is_opt(
   "negatable usage",
 );
 
+is_opt(
+  [ ],
+  [
+    [ req => 'a required option' => {
+      required => 1
+    } ],
+  ],
+  qr/a required option/,
+  "required option -- help text"
+);
+
 {
   local @ARGV;
   my ($opt, $usage) = describe_options(
@@ -156,3 +167,4 @@ is_opt(
     "spacer and non-option description found",
   );
 }
+

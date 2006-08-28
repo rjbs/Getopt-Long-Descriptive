@@ -13,11 +13,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
- 0.05_02
+ 0.06
 
 =cut
 
-our $VERSION = '0.05_02';
+our $VERSION = '0.06';
 
 =head1 DESCRIPTION
 
@@ -371,6 +371,7 @@ sub describe_options {
       params => \%return,
       spec   => $copt->{constraint},
       opts   => \@opts,
+      usage  => $usage,
     );
     next unless (defined($new) || exists($return{$name}));
     $return{$name} = $new;
@@ -393,6 +394,7 @@ sub _validate_with {
     params => 1,
     spec   => 1,
     opts   => 1,
+    usage  => 1,
   });
   my $spec = $arg{spec};
   my %pvspec;
@@ -437,11 +439,25 @@ sub _validate_with {
   #local $Data::Dumper::Terse = 1;
   #local $Data::Dumper::Indent = 0;
   #warn "pvspec = " . Dumper(\%pvspec);
-  my %p = validate_with(
-    params => [ %{$arg{params}} ],
-    spec   => { $arg{name} => \%pvspec },
-    allow_extra => 1,
-  );
+  my %p = eval { 
+    validate_with(
+      params => [ %{$arg{params}} ],
+      spec   => { $arg{name} => \%pvspec },
+      allow_extra => 1,
+    );
+  };
+
+  if ($@) {
+    if ($@ =~ /^Mandatory parameter '([^']+)' missing/) {
+      my $missing = $1;
+      $arg{usage}->die({
+        pre_text => "Required option missing: $1\n",
+      });
+    }
+
+    die $@;
+  }
+      
   return $p{$arg{name}};
 }
 
@@ -502,7 +518,17 @@ sub text { shift->(1) }
 
 sub warn { shift->() }
 
-sub die  { die shift->text }
+sub die  { 
+  my $self = shift;
+  my $arg  = shift || {};
+
+  die(
+    join(
+      "", 
+      grep { defined } $arg->{pre_text}, $self->text, $arg->{post_text},
+    )
+  );
+}
 
 use overload (
   q{""} => "text",
