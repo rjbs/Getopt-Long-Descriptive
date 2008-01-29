@@ -168,3 +168,11 @@ is_opt(
   );
 }
 
+{
+  local @ARGV = qw(--foo);
+  my ($opt, $usage) = describe_options(
+    "%c %o",
+    [ "foo", '' ],
+  );
+  is( $opt->{foo}, 1, "empty-but-present description is ok" );
+}
