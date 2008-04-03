@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
+0.071   2008-04-03
+
+        fix RT#34153 (bcbailey++)
+
 0.070   2008-01-29
 
         fix RT#32481 (nothingmuch++)
