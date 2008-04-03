@@ -295,10 +295,13 @@ sub describe_options {
     $_->{desc} ne 'spacer'
   } _nohidden(@opts);
 
+
+  my $spec_assignment = '(?:[:=][\d\w\+]+[%@]?({\d*,\d*})?|[!+])$';
+
   my $short = join "", sort {
     lc $a cmp lc $b
   } map {
-    (my $s = $_) =~ s/([:=]\w+|!)$//;
+    (my $s = $_) =~ s/$spec_assignment//;
     grep /^.$/, split /\|/, $s
   } @specs;
   
@@ -343,7 +346,7 @@ sub describe_options {
         printf {$out_fh} "$spec_fmt\n", $opt->{spec};
         next;
       }
-      $spec =~ s/([:=]\w+[%@]?|!)$//;
+      $spec =~ s/$spec_assignment//;
       $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
                                 split /\|/, $spec;
       printf {$out_fh} "$spec_fmt  %s\n", $spec, $desc;

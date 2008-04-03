@@ -124,6 +124,7 @@ is_opt(
   [ [ mode => $foobar ] ],
   #qr/\Qonly one 'mode' option (foo, bar)\E/,
   qr/it is 'foo' already/,
+  "only one 'mode' option",
 );
 
 is_opt(
@@ -165,6 +166,26 @@ is_opt(
     $usage->text,
     qr/foo option\n\s+\n\tbar options:\n\s+--bar/,
     "spacer and non-option description found",
+  );
+}
+
+{
+  local @ARGV;
+  my ($opt, $usage) = describe_options(
+    "%c %o",
+    [ 'foo'          => "foo option" ],
+    [ 'bar|b'        => "bar option" ],
+    [ 'string|s=s'   => "string value" ],
+    [ 'string|S:s'   => "optional string value" ],
+    [ 'list|l=s@'    => "list of strings" ],
+    [ 'hash|h=s%'    => "hash values" ],
+    [ 'optional|o!'  => "optional" ],
+    [ 'increment|i+' => "incremental option" ],
+  );
+  like(
+    $usage->text,
+    qr/\[-bhiloSs\]/,
+    "short options",
   );
 }
 
