@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
+0.072   2008-04-03
+
+        remove duplicate option name in test
+
 0.071   2008-04-03
 
         fix RT#34153 (bcbailey++)
