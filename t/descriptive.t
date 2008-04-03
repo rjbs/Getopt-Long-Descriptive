@@ -176,7 +176,7 @@ is_opt(
     [ 'foo'          => "foo option" ],
     [ 'bar|b'        => "bar option" ],
     [ 'string|s=s'   => "string value" ],
-    [ 'string|S:s'   => "optional string value" ],
+    [ 'ostring|S:s'  => "optional string value" ],
     [ 'list|l=s@'    => "list of strings" ],
     [ 'hash|h=s%'    => "hash values" ],
     [ 'optional|o!'  => "optional" ],
