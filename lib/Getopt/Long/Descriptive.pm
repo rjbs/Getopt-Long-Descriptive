@@ -13,11 +13,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
- 0.070
+Version 0.073
 
 =cut
 
-our $VERSION = '0.071';
+our $VERSION = '0.073';
 
 =head1 DESCRIPTION
 
@@ -299,7 +299,8 @@ sub describe_options {
   my $spec_assignment = '(?:[:=][\d\w\+]+[%@]?({\d*,\d*})?|[!+])$';
 
   my $short = join "", sort {
-    lc $a cmp lc $b
+    lc $a cmp lc $b 
+    or $a cmp $b
   } map {
     (my $s = $_) =~ s/$spec_assignment//;
     grep /^.$/, split /\|/, $s
