@@ -1,5 +1,13 @@
 Revision history for Getopt-Long-Descriptive
 
+0.074   2008-05-11
+
+        fix RT#35678 (thanks RJBS)
+
+0.073   2008-04-04
+
+        packaging fix
+
 0.072   2008-04-03
 
         remove duplicate option name in test

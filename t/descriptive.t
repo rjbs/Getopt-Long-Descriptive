@@ -197,3 +197,14 @@ is_opt(
   );
   is( $opt->{foo}, 1, "empty-but-present description is ok" );
 }
+
+{
+  local @ARGV = qw(--foo-bar);
+  my ($opt) = describe_options(
+    "%c %o",
+    [ "foo:s", "foo option" ],
+    [ "foo-bar", "foo-bar option", { implies => 'foo' } ],
+  );
+  is_deeply($opt, { foo => 1, foo_bar => 1 },
+    "ok to imply option with optional argument");
+}
