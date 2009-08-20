@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
+0.076   2009-08-20
+        bundle the accidentally omitted Usage.pm file
+        the $opt returned by described_options is now an object with accessors
+
 0.075   2009-08-19
         significant refactoring, especially to GLD::Usage, which is now a more
         traditional (non-hash-based) object (RJBS)

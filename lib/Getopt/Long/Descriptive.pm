@@ -15,11 +15,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
-Version 0.075
+Version 0.076
 
 =cut
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 =head1 DESCRIPTION
 
@@ -494,7 +494,7 @@ sub _mk_only_one {
   package
     Getopt::Long::Descriptive::OptObjFactory;
 
-  my $VERSION = '0.075';
+  my $VERSION = '0.076';
 
   use Carp ();
 
