@@ -493,7 +493,7 @@ sub _mk_only_one {
   # Clever line break to avoid indexing! -- rjbs, 2009-08-20
   package
     Getopt::Long::Descriptive::OptObjFactory;
-  my %CACHE;
+
   my $VERSION = '0.075';
 
   use Carp ();
@@ -505,14 +505,12 @@ sub _mk_only_one {
     
     my %given = %{ $arg->{values} };
 
-    Carp::confess "perverse option name given" if grep { m{$;} } keys %given;
-    my $key = join qq{$;}, sort keys %given;
+    my @bad = grep { $_ !~ /^[a-z_]\w+/ } keys %given;
+    Carp::confess "perverse option names given: @bad" if @bad;
 
-    my $class;
-    if (exists $CACHE{ $key }) {
-      $class = $CACHE{ $key };
-    } else {
-      $class = $CACHE{ $key } = "$inv_class\::_::" . $i++;
+    my $class = "$inv_class\::_::" . $i++;
+
+    {
       no strict 'refs';
       ${"$class\::VERSION"} = $inv_class->VERSION;
       for my $opt (keys %given) {
