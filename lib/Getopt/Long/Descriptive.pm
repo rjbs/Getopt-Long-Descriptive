@@ -326,35 +326,12 @@ sub describe_options {
   my $spec_fmt = "\t%-${length}s";
 
   my @showopts = _nohidden(@opts);
-  my $usage = bless sub {
-    my ($as_string) = @_;
-    my ($out_fh, $buffer);
-    my @tmpopts = @showopts;
-    if ($as_string) {
-      require IO::Scalar;
-      $out_fh = IO::Scalar->new( \$buffer );
-    } else {
-      $out_fh = \*STDERR;
-    }
-
-    print {$out_fh} "$str\n";
-
-    while (@tmpopts) {
-      my $opt  = shift @tmpopts;
-      my $spec = $opt->{spec};
-      my $desc = $opt->{desc};
-      if ($desc eq 'spacer') {
-        printf {$out_fh} "$spec_fmt\n", $opt->{spec};
-        next;
-      }
-      $spec =~ s/$spec_assignment//;
-      $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
-                                split /\|/, $spec;
-      printf {$out_fh} "$spec_fmt  %s\n", $spec, $desc;
-    }
-
-    return $buffer if $as_string;
-  } => "Getopt::Long::Descriptive::Usage";
+  my $usage = Getopt::Long::Descriptive::Usage->new({
+    showopts => \@showopts,
+    str      => $str,
+    spec_fmt => $spec_fmt,
+    spec_assignment => $spec_assignment,
+  });
 
   Getopt::Long::Configure(@go_conf);
 
@@ -516,7 +493,44 @@ sub _mk_only_one {
 
 package Getopt::Long::Descriptive::Usage;
 
-use strict;
+sub new {
+  my ($class, $arg) = @_;
+
+  my @showopts = @{ $arg->{showopts} || [] };
+  my $str      = $arg->{str};
+  my $spec_fmt = $arg->{spec_fmt};
+  my $spec_assignment = $arg->{spec_assignment};
+
+  bless sub {
+    my ($as_string) = @_;
+    my ($out_fh, $buffer);
+    my @tmpopts = @showopts;
+    if ($as_string) {
+      require IO::Scalar;
+      $out_fh = IO::Scalar->new( \$buffer );
+    } else {
+      $out_fh = \*STDERR;
+    }
+
+    print {$out_fh} "$str\n";
+
+    while (@tmpopts) {
+      my $opt  = shift @tmpopts;
+      my $spec = $opt->{spec};
+      my $desc = $opt->{desc};
+      if ($desc eq 'spacer') {
+        printf {$out_fh} "$spec_fmt\n", $opt->{spec};
+        next;
+      }
+      $spec =~ s/$spec_assignment//;
+      $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
+                                split /\|/, $spec;
+      printf {$out_fh} "$spec_fmt  %s\n", $spec, $desc;
+    }
+
+    return $buffer if $as_string;
+  } => $class;
+}
 
 sub text { shift->(1) }
 
