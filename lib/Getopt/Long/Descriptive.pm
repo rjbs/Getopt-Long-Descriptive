@@ -548,7 +548,13 @@ sub die  {
 
 use overload (
   q{""} => "text",
-);
+  '&{}' => sub {
+    my ($self) = @_;
+    return sub {
+      my ($to_string) = @_;
+      return $to_string ? $self->text : $self->warn;
+    };
+  };
 
 =head1 AUTHOR
 
