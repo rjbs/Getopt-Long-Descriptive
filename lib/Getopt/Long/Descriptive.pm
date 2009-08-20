@@ -496,45 +496,43 @@ package Getopt::Long::Descriptive::Usage;
 sub new {
   my ($class, $arg) = @_;
 
-  my @showopts = @{ $arg->{showopts} || [] };
-  my $str      = $arg->{str};
-  my $spec_fmt = $arg->{spec_fmt};
-  my $spec_assignment = $arg->{spec_assignment};
+  my @to_copy = qw(showopts str spec_fmt spec_assignment);
 
-  bless sub {
-    my ($as_string) = @_;
-    my ($out_fh, $buffer);
-    my @tmpopts = @showopts;
-    if ($as_string) {
-      require IO::Scalar;
-      $out_fh = IO::Scalar->new( \$buffer );
-    } else {
-      $out_fh = \*STDERR;
-    }
+  my %copy;
+  @copy{ @to_copy } = @$arg{ @to_copy };
 
-    print {$out_fh} "$str\n";
-
-    while (@tmpopts) {
-      my $opt  = shift @tmpopts;
-      my $spec = $opt->{spec};
-      my $desc = $opt->{desc};
-      if ($desc eq 'spacer') {
-        printf {$out_fh} "$spec_fmt\n", $opt->{spec};
-        next;
-      }
-      $spec =~ s/$spec_assignment//;
-      $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
-                                split /\|/, $spec;
-      printf {$out_fh} "$spec_fmt  %s\n", $spec, $desc;
-    }
-
-    return $buffer if $as_string;
-  } => $class;
+  bless \%copy => $class;
 }
 
-sub text { shift->(1) }
+sub text {
+  my ($self) = @_;
 
-sub warn { shift->() }
+  my @showopts = @{ $self->{showopts} || [] };
+  my @tmpopts  = @showopts;
+  my $str      = $self->{str};
+  my $spec_fmt = $self->{spec_fmt};
+  my $spec_assignment = $self->{spec_assignment};
+
+  my $string = "$str\n";
+
+  while (@tmpopts) {
+    my $opt  = shift @tmpopts;
+    my $spec = $opt->{spec};
+    my $desc = $opt->{desc};
+    if ($desc eq 'spacer') {
+      $string .= sprintf "$spec_fmt\n", $opt->{spec};
+      next;
+    }
+    $spec =~ s/$spec_assignment//;
+    $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
+                              split /\|/, $spec;
+    $string .= sprintf "$spec_fmt  %s\n", $spec, $desc;
+  }
+
+  return $string;
+}
+
+sub warn { warn shift->text }
 
 sub die  { 
   my $self = shift;
