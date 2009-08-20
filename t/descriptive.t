@@ -27,6 +27,10 @@ sub is_opt {
       $expect,
       $desc,
     );
+
+    for my $key (keys %$expect) {
+      is($opt->$key, $expect->{$key}, "...->$key");
+    }
   }; 
   if ($@) {
     chomp($@);
@@ -203,6 +207,7 @@ is_opt(
     [ "foo", '' ],
   );
   is( $opt->{foo}, 1, "empty-but-present description is ok" );
+  is( $opt->foo,   1, "empty-but-present description is ok" );
 }
 
 {
@@ -214,4 +219,7 @@ is_opt(
   );
   is_deeply($opt, { foo => 1, foo_bar => 1 },
     "ok to imply option with optional argument");
+
+  is($opt->foo_bar, 1, 'given value (checked with method)');
+  is($opt->foo,     1, 'implied value (checked with method)');
 }

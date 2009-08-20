@@ -358,7 +358,11 @@ sub describe_options {
     $return{$name} = $new;
   }
 
-  return \%return, $usage;
+  my $opt_obj = Getopt::Long::Descriptive::OptObjFactory->new_opt_obj({
+    values => \%return,
+  });
+
+  return($opt_obj, $usage);
 }
 
 sub _munge {
@@ -490,6 +494,38 @@ sub _mk_implies {
 sub _mk_only_one {
   die "unimplemented";
 }
+
+{
+  package Getopt::Long::Descriptive::OptObjFactory;
+  my %CACHE;
+
+  use Carp ();
+
+  my $i = 1;
+
+  sub new_opt_obj {
+    my ($inv_class, $arg) = @_;
+    
+    my %given = %{ $arg->{values} };
+
+    Carp::confess "perverse option name given" if grep { m{$;} } keys %given;
+    my $key = join qq{$;}, sort keys %given;
+
+    my $class;
+    if (exists $CACHE{ $key }) {
+      $class = $CACHE{ $key };
+    } else {
+      $class = $CACHE{ $key } = "$inv_class\::_::" . $i++;
+      no strict 'refs';
+      for my $opt (keys %given) {
+        *{"$class\::$opt"} = sub { $_[0]->{ $opt } };
+      }
+    }
+
+    bless \%given => $class;
+  }
+}
+
 
 =head1 AUTHOR
 
