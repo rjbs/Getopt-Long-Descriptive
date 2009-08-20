@@ -2,10 +2,12 @@ package Getopt::Long::Descriptive;
 
 use strict;
 use Getopt::Long;
-use List::Util qw(max first);
+use List::Util qw(first);
 use Carp qw(carp croak);
 use Params::Validate qw(:all);
 use File::Basename ();
+
+use Getopt::Long::Descriptive::Usage;
 
 =head1 NAME
 
@@ -248,6 +250,15 @@ my %HIDDEN = (
   hidden => 1,
 );
 
+my $SPEC_RE = qr{(?:[:=][\d\w\+]+[%@]?({\d*,\d*})?|[!+])$};
+sub _strip_assignment {
+  my ($self, $str) = @_;
+
+  (my $copy = $str) =~ s{$SPEC_RE}{};
+
+  return $copy;
+}
+
 sub describe_options {
   my $format = shift;
   my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
@@ -288,19 +299,18 @@ sub describe_options {
   }
 
   push @go_conf, "bundling" unless grep { /bundling/i } @go_conf;
-   
+
+  # not entirely sure that all of this (until the Usage->new) shouldn't be
+  # moved into Usage -- rjbs, 2009-08-19
   my @specs = map { $_->{spec} } grep {
     $_->{desc} ne 'spacer'
   } _nohidden(@opts);
-
-
-  my $spec_assignment = '(?:[:=][\d\w\+]+[%@]?({\d*,\d*})?|[!+])$';
 
   my $short = join "", sort {
     lc $a cmp lc $b 
     or $a cmp $b
   } map {
-    (my $s = $_) =~ s/$spec_assignment//;
+    my $s = __PACKAGE__->_strip_assignment($_);
     grep /^.$/, split /\|/, $s
   } @specs;
   
@@ -318,17 +328,9 @@ sub describe_options {
   (my $str = $format) =~ s/%(.)/$replace{$1}/ge;
   $str =~ s/\s{2,}/ /g;
 
-  # a spec can grow up to 4 characters in usage output:
-  # '-' on short option, ' ' between short and long, '--' on long
-  my $length = (max(map length(), @specs) || 0) + 4;
-  my $spec_fmt = "\t%-${length}s";
-
-  my @showopts = _nohidden(@opts);
   my $usage = Getopt::Long::Descriptive::Usage->new({
-    showopts => \@showopts,
-    str      => $str,
-    spec_fmt => $spec_fmt,
-    spec_assignment => $spec_assignment,
+    options     => [ _nohidden(@opts) ],
+    leader_text => $str,
   });
 
   Getopt::Long::Configure(@go_conf);
@@ -488,72 +490,6 @@ sub _mk_implies {
 sub _mk_only_one {
   die "unimplemented";
 }
-
-package Getopt::Long::Descriptive::Usage;
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my @to_copy = qw(showopts str spec_fmt spec_assignment);
-
-  my %copy;
-  @copy{ @to_copy } = @$arg{ @to_copy };
-
-  bless \%copy => $class;
-}
-
-sub text {
-  my ($self) = @_;
-
-  my @showopts = @{ $self->{showopts} || [] };
-  my @tmpopts  = @showopts;
-  my $str      = $self->{str};
-  my $spec_fmt = $self->{spec_fmt};
-  my $spec_assignment = $self->{spec_assignment};
-
-  my $string = "$str\n";
-
-  while (@tmpopts) {
-    my $opt  = shift @tmpopts;
-    my $spec = $opt->{spec};
-    my $desc = $opt->{desc};
-    if ($desc eq 'spacer') {
-      $string .= sprintf "$spec_fmt\n", $opt->{spec};
-      next;
-    }
-    $spec =~ s/$spec_assignment//;
-    $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
-                              split /\|/, $spec;
-    $string .= sprintf "$spec_fmt  %s\n", $spec, $desc;
-  }
-
-  return $string;
-}
-
-sub warn { warn shift->text }
-
-sub die  { 
-  my $self = shift;
-  my $arg  = shift || {};
-
-  die(
-    join(
-      "", 
-      grep { defined } $arg->{pre_text}, $self->text, $arg->{post_text},
-    )
-  );
-}
-
-use overload (
-  q{""} => "text",
-  '&{}' => sub {
-    my ($self) = @_;
-    return sub {
-      my ($to_string) = @_;
-      return $to_string ? $self->text : $self->warn;
-    };
-  }
-);
 
 =head1 AUTHOR
 
