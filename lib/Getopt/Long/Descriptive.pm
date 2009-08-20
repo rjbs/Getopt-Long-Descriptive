@@ -208,22 +208,20 @@ my $prog_name;
 sub prog_name { @_ ? ($prog_name = shift) : $prog_name }
 
 BEGIN {
-  require Exporter;
-  our @ISA = qw(Exporter);
-  our @EXPORT = qw(describe_options);
-  our %EXPORT_TAGS = (
-    types => $Params::Validate::EXPORT_TAGS{types},
-  );
-  our @EXPORT_OK = (
-    @{$EXPORT_TAGS{types}},
-    @EXPORT,
-    'prog_name',
-  );
-  $EXPORT_TAGS{all} = \@EXPORT_OK;
-
   # grab this before someone decides to change it
   prog_name(File::Basename::basename($0));
 }
+
+use Sub::Exporter -setup => {
+  exports => [
+    qw(describe_options prog_name),
+    @{ $Params::Validate::EXPORT_TAGS{types} }
+  ],
+  groups  => [
+    default => [ qw(describe_options) ],
+    types   => $Params::Validate::EXPORT_TAGS{types},
+  ],
+};
 
 my %CONSTRAINT = (
   implies  => \&_mk_implies,
@@ -554,7 +552,8 @@ use overload (
       my ($to_string) = @_;
       return $to_string ? $self->text : $self->warn;
     };
-  };
+  }
+);
 
 =head1 AUTHOR
 

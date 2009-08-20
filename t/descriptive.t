@@ -162,10 +162,17 @@ is_opt(
     ['bar options:'],
     [ bar => "a bar option" ],
   );
+
   like(
     $usage->text,
     qr/foo option\n\s+\n\tbar options:\n\s+--bar/,
     "spacer and non-option description found",
+  );
+
+  like(
+    $usage->(1),
+    qr/foo option\n\s+\n\tbar options:\n\s+--bar/,
+    "CODEISH: spacer and non-option description found",
   );
 }
 
