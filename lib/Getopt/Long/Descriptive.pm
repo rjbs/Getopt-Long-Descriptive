@@ -15,11 +15,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
-Version 0.076
+Version 0.077
 
 =cut
 
-our $VERSION = '0.076';
+our $VERSION = '0.077';
 
 =head1 DESCRIPTION
 
@@ -494,7 +494,7 @@ sub _mk_only_one {
   package
     Getopt::Long::Descriptive::OptObjFactory;
 
-  my $VERSION = '0.076';
+  my $VERSION = '0.077';
 
   use Carp ();
 
@@ -505,7 +505,7 @@ sub _mk_only_one {
     
     my %given = %{ $arg->{values} };
 
-    my @bad = grep { $_ !~ /^[a-z_]\w+/ } keys %given;
+    my @bad = grep { $_ !~ /^[a-z_]\w*/ } keys %given;
     Carp::confess "perverse option names given: @bad" if @bad;
 
     my $class = "$inv_class\::_::" . $i++;
