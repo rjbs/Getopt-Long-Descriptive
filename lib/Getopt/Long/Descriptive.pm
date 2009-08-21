@@ -214,9 +214,11 @@ BEGIN {
   prog_name(File::Basename::basename($0));
 }
 
+use Sub::Exporter::Util ();
 use Sub::Exporter -setup => {
   exports => [
-    qw(describe_options prog_name),
+    describe_options => \'_build_describe_options',
+    q(prog_name),
     @{ $Params::Validate::EXPORT_TAGS{types} }
   ],
   groups  => [
@@ -259,110 +261,123 @@ sub _strip_assignment {
   return $copy;
 }
 
+# This is here only to deal with people who were calling this fully-qualified
+# without importing.  Sucks to them!  -- rjbs, 2009-08-21
 sub describe_options {
-  my $format = shift;
-  my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
-  my @opts;
+  my $sub = __PACKAGE__->_build_describe_options(describe_options => {} => {});
+  $sub->();
+}
 
-  # special casing
-  # wish we had real loop objects
-  for my $opt (_expand(@_)) {
-    if (ref($opt->{desc}) eq 'ARRAY') {
-      $opt->{constraint}->{one_of} = delete $opt->{desc};
-      $opt->{desc} = 'hidden';
-    }
-    if ($HIDDEN{$opt->{desc}}) {
-      $opt->{constraint}->{hidden}++;
-    }
-    if ($opt->{constraint}->{one_of}) {
-      for my $one_opt (_expand(
-        @{delete $opt->{constraint}->{one_of}}
-      )) {
-        $one_opt->{constraint}->{implies}
-          ->{$opt->{name}} = $one_opt->{name};
-        for my $wipe (qw(required default)) {
-          if ($one_opt->{constraint}->{$wipe}) {
-            carp "'$wipe' constraint does not make sense in sub-option";
-            delete $one_opt->{constraint}->{$wipe};
-          }
-        }
-        $one_opt->{constraint}->{one_of} = $opt->{name};
-        push @opts, $one_opt;
+sub usage_class { 'Getopt::Long::Descriptive::Usage' }
+
+sub _build_describe_options {
+  my ($class) = @_;
+
+  sub {
+    my $format = shift;
+    my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
+    my @opts;
+
+    # special casing
+    # wish we had real loop objects
+    for my $opt (_expand(@_)) {
+      if (ref($opt->{desc}) eq 'ARRAY') {
+        $opt->{constraint}->{one_of} = delete $opt->{desc};
+        $opt->{desc} = 'hidden';
       }
+      if ($HIDDEN{$opt->{desc}}) {
+        $opt->{constraint}->{hidden}++;
+      }
+      if ($opt->{constraint}->{one_of}) {
+        for my $one_opt (_expand(
+          @{delete $opt->{constraint}->{one_of}}
+        )) {
+          $one_opt->{constraint}->{implies}
+            ->{$opt->{name}} = $one_opt->{name};
+          for my $wipe (qw(required default)) {
+            if ($one_opt->{constraint}->{$wipe}) {
+              carp "'$wipe' constraint does not make sense in sub-option";
+              delete $one_opt->{constraint}->{$wipe};
+            }
+          }
+          $one_opt->{constraint}->{one_of} = $opt->{name};
+          push @opts, $one_opt;
+        }
+      }
+      push @opts, $opt;
     }
-    push @opts, $opt;
-  }
-  
-  my @go_conf = @{ $arg->{getopt_conf} || $arg->{getopt} || [] };
-  if ($arg->{getopt}) {
-    warn "describe_options: 'getopt' is deprecated, please use 'getopt_conf' instead\n";
-  }
+    
+    my @go_conf = @{ $arg->{getopt_conf} || $arg->{getopt} || [] };
+    if ($arg->{getopt}) {
+      warn "describe_options: 'getopt' is deprecated, please use 'getopt_conf' instead\n";
+    }
 
-  push @go_conf, "bundling" unless grep { /bundling/i } @go_conf;
+    push @go_conf, "bundling" unless grep { /bundling/i } @go_conf;
 
-  # not entirely sure that all of this (until the Usage->new) shouldn't be
-  # moved into Usage -- rjbs, 2009-08-19
-  my @specs = map { $_->{spec} } grep {
-    $_->{desc} ne 'spacer'
-  } _nohidden(@opts);
+    # not entirely sure that all of this (until the Usage->new) shouldn't be
+    # moved into Usage -- rjbs, 2009-08-19
+    my @specs = map { $_->{spec} } grep {
+      $_->{desc} ne 'spacer'
+    } _nohidden(@opts);
 
-  my $short = join "", sort {
-    lc $a cmp lc $b 
-    or $a cmp $b
-  } map {
-    my $s = __PACKAGE__->_strip_assignment($_);
-    grep /^.$/, split /\|/, $s
-  } @specs;
-  
-  my $long = grep /\b[^|]{2,}/, @specs;
+    my $short = join "", sort {
+      lc $a cmp lc $b 
+      or $a cmp $b
+    } map {
+      my $s = __PACKAGE__->_strip_assignment($_);
+      grep /^.$/, split /\|/, $s
+    } @specs;
+    
+    my $long = grep /\b[^|]{2,}/, @specs;
 
-  my %replace = (
-    "%" => "%",
-    "o" => (join(" ",
-                 ($short ? "[-$short]" : ()),
-                 ($long  ? "[long options...]" : ())
-               )),
-    "c" => prog_name,
-  );
-
-  (my $str = $format) =~ s/%(.)/$replace{$1}/ge;
-  $str =~ s/\s{2,}/ /g;
-
-  my $usage = Getopt::Long::Descriptive::Usage->new({
-    options     => [ _nohidden(@opts) ],
-    leader_text => $str,
-  });
-
-  Getopt::Long::Configure(@go_conf);
-
-  my %return;
-  $usage->die unless GetOptions(\%return, grep { length } @specs);
-
-  for my $opt (keys %return) {
-    my $newopt = _munge($opt);
-    next if $newopt eq $opt;
-    $return{$newopt} = delete $return{$opt};
-  }
-
-  for my $copt (grep { $_->{constraint} } @opts) {
-    delete $copt->{constraint}->{hidden};
-    my $name = $copt->{name};
-    my $new  = _validate_with(
-      name   => $name,
-      params => \%return,
-      spec   => $copt->{constraint},
-      opts   => \@opts,
-      usage  => $usage,
+    my %replace = (
+      "%" => "%",
+      "o" => (join(" ",
+                   ($short ? "[-$short]" : ()),
+                   ($long  ? "[long options...]" : ())
+                 )),
+      "c" => prog_name,
     );
-    next unless (defined($new) || exists($return{$name}));
-    $return{$name} = $new;
+
+    (my $str = $format) =~ s/%(.)/$replace{$1}/ge;
+    $str =~ s/\s{2,}/ /g;
+
+    my $usage = $class->usage_class->new({
+      options     => [ _nohidden(@opts) ],
+      leader_text => $str,
+    });
+
+    Getopt::Long::Configure(@go_conf);
+
+    my %return;
+    $usage->die unless GetOptions(\%return, grep { length } @specs);
+
+    for my $opt (keys %return) {
+      my $newopt = _munge($opt);
+      next if $newopt eq $opt;
+      $return{$newopt} = delete $return{$opt};
+    }
+
+    for my $copt (grep { $_->{constraint} } @opts) {
+      delete $copt->{constraint}->{hidden};
+      my $name = $copt->{name};
+      my $new  = _validate_with(
+        name   => $name,
+        params => \%return,
+        spec   => $copt->{constraint},
+        opts   => \@opts,
+        usage  => $usage,
+      );
+      next unless (defined($new) || exists($return{$name}));
+      $return{$name} = $new;
+    }
+
+    my $opt_obj = Getopt::Long::Descriptive::OptObjFactory->new_opt_obj({
+      values => \%return,
+    });
+
+    return($opt_obj, $usage);
   }
-
-  my $opt_obj = Getopt::Long::Descriptive::OptObjFactory->new_opt_obj({
-    values => \%return,
-  });
-
-  return($opt_obj, $usage);
 }
 
 sub _munge {

@@ -118,6 +118,16 @@ sub warn { warn shift->text }
 
 This throws the usage message as an exception.
 
+  $usage_obj->die(\%arg);
+
+Some arguments can be provided 
+
+  pre_text  - text to be prepended to the usage message
+  post_text - text to be appended to the usage message
+
+The C<pre_text> and C<post_text> arguments are concatenated with the usage
+message with no line breaks, so supply this if you need them.
+
 =cut
 
 sub die  { 
@@ -125,10 +135,7 @@ sub die  {
   my $arg  = shift || {};
 
   die(
-    join(
-      "", 
-      grep { defined } $arg->{pre_text}, $self->text, $arg->{post_text},
-    )
+    join q{}, grep { defined } $arg->{pre_text}, $self->text, $arg->{post_text}
   );
 }
 
@@ -139,6 +146,7 @@ use overload (
   # this way.  Later we can toss a warning in here. -- rjbs, 2009-08-19
   '&{}' => sub {
     my ($self) = @_;
+    Carp::cluck("use of __PACKAGE__ objects as a code ref is deprecated");
     return sub { return $_[0] ? $self->text : $self->warn; };
   }
 );
@@ -149,11 +157,10 @@ Hans Dieter Pearcey, C<< <hdp@cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to
-C<bug-getopt-long-descriptive@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Getopt-Long-Descriptive>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+Please report any bugs or feature requests through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Getopt-Long-Descriptive>.  I
+will be notified, and then you'll automatically be notified of progress on your
+bug as I make changes.
 
 =head1 COPYRIGHT & LICENSE
 

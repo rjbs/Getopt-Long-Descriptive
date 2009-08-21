@@ -173,6 +173,7 @@ is_opt(
     "spacer and non-option description found",
   );
 
+  local $SIG{__WARN__} = sub {}; # we know that this will warn; don't care
   like(
     $usage->(1),
     qr/foo option\n\s+\n\tbar options:\n\s+--bar/,
