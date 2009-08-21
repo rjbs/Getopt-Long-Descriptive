@@ -15,11 +15,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
-Version 0.077
+Version 0.078
 
 =cut
 
-our $VERSION = '0.077';
+our $VERSION = '0.078';
 
 =head1 DESCRIPTION
 

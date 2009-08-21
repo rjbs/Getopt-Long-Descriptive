@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+0.078   2009-08-21
+        refactoring to allow subclassing of Getopt::Long::Descriptive
+
 0.077   2009-08-21
         allow 'f' as an option name; had mistakenly required 2 characters
 
