@@ -2,6 +2,8 @@ package Getopt::Long::Descriptive::Usage;
 use strict;
 use warnings;
 
+our $VERSION = '0.077';
+
 use List::Util qw(max);
 
 =head1 NAME
