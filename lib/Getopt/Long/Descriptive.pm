@@ -15,11 +15,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
-Version 0.078
+Version 0.079
 
 =cut
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 =head1 DESCRIPTION
 
@@ -282,7 +282,10 @@ sub _build_describe_options {
 
     # special casing
     # wish we had real loop objects
+    my %method_map;
     for my $opt (_expand(@_)) {
+      $method_map{ $opt->{name} } = undef unless $opt->{desc} eq 'spacer';
+ 
       if (ref($opt->{desc}) eq 'ARRAY') {
         $opt->{constraint}->{one_of} = delete $opt->{desc};
         $opt->{desc} = 'hidden';
@@ -375,7 +378,7 @@ sub _build_describe_options {
     }
 
     my $opt_obj = $class->_new_opt_obj({
-      values => \%return,
+      values => { %method_map, %return },
     });
 
     return($opt_obj, $usage);
@@ -512,7 +515,7 @@ sub _class_for_opt {
   my ($gld_class, $arg) = @_;
 
   my $values = $arg->{values};
-  my @bad = grep { $_ !~ /^[a-z_]\w*/ } keys %$values;
+  my @bad = grep { $_ !~ /^[a-z_]\w*$/ } keys %$values;
   Carp::confess "perverse option names given: @bad" if @bad;
 
   my $class = "$gld_class\::__OPT__::" . $OPT_CLASS_COUNTER++;

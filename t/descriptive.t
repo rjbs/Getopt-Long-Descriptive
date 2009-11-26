@@ -206,9 +206,13 @@ is_opt(
   my ($opt, $usage) = describe_options(
     "%c %o",
     [ "foo", '' ],
+    [ "bar", '' ],
   );
   is( $opt->{foo}, 1, "empty-but-present description is ok" );
   is( $opt->foo,   1, "empty-but-present description is ok" );
+
+  is( $opt->{bar}, undef, "entry not given is undef (exists? no guarantee)" );
+  is( $opt->bar,   undef, "entry not given is undef (as method)");
 }
 
 {
