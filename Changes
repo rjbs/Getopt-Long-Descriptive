@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
+0.080   2009-11-27
+        fix option naming to ignore "+" used to mark cumulative options
+        fix direct calls to Getopt::Long::Descriptive::describe_options
+
 0.079   2009-11-26 Happy Thanksgiving!
         improve the "opt as object" facility to have all opts as methods
 
