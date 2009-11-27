@@ -1,5 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
+0.081   2009-11-27
+        \%opt will not contain entries for opts that were not given
+        (this reverts 0.079 and 0.080's new behavior of undef entries)
+
 0.080   2009-11-27
         fix option naming to ignore "+" used to mark cumulative options
         fix direct calls to Getopt::Long::Descriptive::describe_options
