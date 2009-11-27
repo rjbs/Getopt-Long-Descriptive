@@ -267,7 +267,7 @@ sub _strip_assignment {
 # without importing.  Sucks to them!  -- rjbs, 2009-08-21
 sub describe_options {
   my $sub = __PACKAGE__->_build_describe_options(describe_options => {} => {});
-  $sub->();
+  $sub->(@_);
 }
 
 sub usage_class { 'Getopt::Long::Descriptive::Usage' }
