@@ -535,7 +535,18 @@ sub _new_opt_obj {
   my ($gld_class, $arg) = @_;
   
   my $class = $gld_class->_class_for_opt($arg);
-  bless { %{ $arg->{values} } } => $class;
+
+  # This is stupid, but the traditional behavior was that if --foo was not
+  # given, there is no $opt->{foo}; it started to show up when we "needed" all
+  # the keys to generate a class, but was undef; this wasn't a problem, but
+  # broke tests of things that were relying on not-exists like tests of %$opt
+  # contents or MooseX::Getopt which wanted to use things as args for new --
+  # undef would not pass an Int TC.  Easier to just do this. -- rjbs,
+  # 2009-11-27
+  my $obj = bless { %{ $arg->{values} } } => $class;
+  delete $obj->{$_} for grep { ! defined $obj->{$_} } keys %$obj;
+
+  return $obj;
 }
 
 =head1 CUSTOMIZING
