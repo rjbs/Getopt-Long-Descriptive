@@ -246,7 +246,7 @@ sub _expand {
     spec       => $_->[0] || '',
     desc       => @$_ > 1 ? $_->[1] : 'spacer',
     constraint => $_->[2] || {},
-    name       => _munge((split /[:=|!]/, $_->[0] || '')[0]),
+    name       => _munge((split /[:=|!+]/, $_->[0] || '')[0]),
   )} } @_;
 }
     
