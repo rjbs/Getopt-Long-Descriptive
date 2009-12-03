@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+0.082   2009-12-03
+        require Getopt::Long 2.33 for proper --no-foo handling
+
 0.081   2009-11-27
         \%opt will not contain entries for opts that were not given
         (this reverts 0.079 and 0.080's new behavior of undef entries)

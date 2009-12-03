@@ -9,6 +9,7 @@ WriteMakefile(
   ABSTRACT_FROM       => 'lib/Getopt/Long/Descriptive.pm',
   PL_FILES            => {},
   PREREQ_PM => {
+    'Getopt::Long'     => 2.33, # !-options get --no-X
     'List::Util'       => 0,
     'Params::Validate' => '0.74',
     'Sub::Exporter'    => 0,

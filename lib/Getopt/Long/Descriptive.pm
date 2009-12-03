@@ -1,7 +1,7 @@
 package Getopt::Long::Descriptive;
 
 use strict;
-use Getopt::Long;
+use Getopt::Long 2.33;
 use List::Util qw(first);
 use Carp qw(carp croak);
 use Params::Validate qw(:all);
