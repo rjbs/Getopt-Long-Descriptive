@@ -32,6 +32,9 @@ multiple underscores (in case you're reading the source) are private.
 
 =head1 METHODS
 
+B<Achtung!>  All methods beginning with an underscore are experimental as of
+today, 2009-12-12.  They are likely to be formally made permanent soon.
+
 =head2 _specified
 
 This method returns true if the given name was specified on the command line.
