@@ -2,6 +2,8 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive::Opts;
 
+use Scalar::Util qw(blessed weaken);
+
 =head1 NAME
 
 Getopt::Long::Descriptive::Opts - object representing command line switches
@@ -24,8 +26,9 @@ Every call to C<describe_options> will return a object of a new subclass of
 this class.  It will have a method for the canonical name of each option
 possible given the option specifications.
 
-Method names beginning with an single underscore are public.  There is only one
-right now.
+Method names beginning with an single underscore are public, and are named that
+way to avoid conflict with automatically generated methods.  Methods with
+multiple underscores (in case you're reading the source) are private.
 
 =head1 METHODS
 
@@ -41,28 +44,49 @@ default, C<_specified> will return true for foo and bar, and false for baz.
 my %_CREATED_OPTS;
 my $SERIAL_NUMBER = 1;
 
-sub DESTROY {
-  my ($self) = @_;
-  my $refaddr = Scalar::Util::refaddr($self);
-  delete $_CREATED_OPTS{ $refaddr };
-}
-
 sub _specified {
   my ($self, $name) = @_;
-  my $refaddr = Scalar::Util::refaddr($self);
-  my $meta = $_CREATED_OPTS{ $refaddr };
+  my $meta = $_CREATED_OPTS{ blessed $self }{meta};
   return $meta->{given}{ $name };
 }
 
+=head2 _specified_opts
+
+This method returns a hashref of only the values explicitly given.
+
+=cut
+
+sub _specified_opts {
+  my ($self) = @_;
+
+  my $class = blessed $self;
+  my $meta = $_CREATED_OPTS{ $class  }{meta};
+
+  return $meta->{specified_opts} if $meta->{specified_opts};
+
+
+  my @keys = grep { $meta->{given}{ $_ } } (keys %{ $meta->{given} });
+
+  my %opts;
+  @opts{ @keys } = @$self{ @keys };
+
+  $meta->{specified_opts} = \%opts; 
+
+  bless $meta->{specified_opts} => $class;
+  weaken $meta->{specified_opts};
+
+  $meta->{specified_opts};
+}
+
 sub ___class_for_opt {
-  my ($class, $arg, $refaddr) = @_;
+  my ($class, $arg) = @_;
 
   my $values = $arg->{values};
   my @bad = grep { $_ !~ /^[a-z_]\w*$/ } keys %$values;
-  Carp::confess "perverse option names given: @bad" if @bad;
+  Carp::confess("perverse option names given: @bad") if @bad;
 
-  $_CREATED_OPTS{ $refaddr } = $arg;
   my $new_class = "$class\::__OPT__::" . $SERIAL_NUMBER++;
+  $_CREATED_OPTS{ $new_class } = { meta => $arg };
 
   {
     no strict 'refs';
@@ -81,7 +105,7 @@ sub ___new_opt_obj {
   
   my $copy = { %{ $arg->{values} } };
 
-  my $new_class = $class->___class_for_opt($arg, Scalar::Util::refaddr($copy));
+  my $new_class = $class->___class_for_opt($arg);
 
   # This is stupid, but the traditional behavior was that if --foo was not
   # given, there is no $opt->{foo}; it started to show up when we "needed" all
@@ -92,7 +116,12 @@ sub ___new_opt_obj {
   # 2009-11-27
   delete $copy->{$_} for grep { ! defined $copy->{$_} } keys %$copy;
 
-  return bless $copy => $new_class;
+  my $self = bless $copy => $new_class;
+
+  $_CREATED_OPTS{ $new_class }{meta}{complete} = $self;
+  weaken $_CREATED_OPTS{ $new_class }{meta}{complete};
+
+  return $self;
 }
 
 =head1 AUTHOR
