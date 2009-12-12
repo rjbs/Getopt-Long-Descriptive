@@ -52,7 +52,8 @@ sub _specified {
 
 =head2 _specified_opts
 
-This method returns a hashref of only the values explicitly given.
+This method returns an opt object in which only explicitly specified values are
+defined.  Values which were set by defaults will appear undef.
 
 =cut
 
@@ -63,7 +64,6 @@ sub _specified_opts {
   my $meta = $_CREATED_OPTS{ $class  }{meta};
 
   return $meta->{specified_opts} if $meta->{specified_opts};
-
 
   my @keys = grep { $meta->{given}{ $_ } } (keys %{ $meta->{given} });
 
@@ -76,6 +76,21 @@ sub _specified_opts {
   weaken $meta->{specified_opts};
 
   $meta->{specified_opts};
+}
+
+=head2 _complete_opts
+
+This method returns the opts object with all values, including those set by
+defaults.  It is probably not going to be very often-used.
+
+=cut
+
+sub _complete_opts {
+  my ($self) = @_;
+
+  my $class = blessed $self;
+  my $meta = $_CREATED_OPTS{ $class  }{meta};
+  return $meta->{complete_opts};
 }
 
 sub ___class_for_opt {
@@ -118,8 +133,8 @@ sub ___new_opt_obj {
 
   my $self = bless $copy => $new_class;
 
-  $_CREATED_OPTS{ $new_class }{meta}{complete} = $self;
-  weaken $_CREATED_OPTS{ $new_class }{meta}{complete};
+  $_CREATED_OPTS{ $new_class }{meta}{complete_opts} = $self;
+  # weaken $_CREATED_OPTS{ $new_class }{meta}{complete_opts};
 
   return $self;
 }

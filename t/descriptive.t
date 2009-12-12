@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 37;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -210,14 +210,18 @@ is_opt(
   );
 
   my $s_opt = $c_opt->_specified_opts;
+  my $C_opt = $s_opt->_complete_opts;
 
   is($c_opt->foo, 'FOO', 'c_opt->foo is FOO');
+  is($C_opt->foo, 'FOO', 'C_opt->foo is FOO');
   is($s_opt->foo, 'FOO', 's_opt->foo is FOO');
 
   is($c_opt->bar, 'BAR', 'c_opt->foo is BAR');
+  is($C_opt->bar, 'BAR', 'C_opt->foo is BAR');
   is($s_opt->bar, undef, 's_opt->foo is undef');
 
   is($c_opt->baz, 'BAZ', 'c_opt->foo is BAZ');
+  is($C_opt->baz, 'BAZ', 'C_opt->foo is BAZ');
   is($s_opt->baz, 'BAZ', 's_opt->foo is BAZ');
 }
 
