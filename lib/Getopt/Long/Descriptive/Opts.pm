@@ -10,11 +10,11 @@ Getopt::Long::Descriptive::Opts - object representing command line switches
 
 =head1 VERSION
 
-Version 0.083
+Version 0.084
 
 =cut
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 =head1 DESCRIPTION
 

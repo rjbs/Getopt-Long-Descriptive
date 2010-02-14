@@ -17,11 +17,11 @@ Getopt::Long::Descriptive - Getopt::Long with usage text
 
 =head1 VERSION
 
-Version 0.083
+Version 0.084
 
 =cut
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 =head1 DESCRIPTION
 
@@ -320,6 +320,7 @@ sub _build_describe_options {
     }
 
     push @go_conf, "bundling" unless grep { /bundling/i } @go_conf;
+    push @go_conf, "no_auto_help"  unless grep { /no_auto_help/i } @go_conf;
 
     # not entirely sure that all of this (until the Usage->new) shouldn't be
     # moved into Usage -- rjbs, 2009-08-19

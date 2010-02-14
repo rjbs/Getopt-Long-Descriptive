@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+0.084   2010-02-14
+        prevent auto-enabling of auto_help (Thanks, DOUGDUDE)
+
 0.083   2009-12-12
         create an Opts module to store the opts object code
         add _specified_opts method and _specified method for Opts
