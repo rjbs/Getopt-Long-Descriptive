@@ -62,8 +62,8 @@ features.
 
 =head1 FUNCTIONS
 
-Getopt::Long::Descriptive only exports one routine, and exports it by default.
-It is exported with L<Sub::Exporter>.
+Getopt::Long::Descriptive only exports one routine by default:
+C<describe_options>.  All GLD's exports are exported by L<Sub::Exporter>.
 
 =head2 describe_options
 
@@ -83,7 +83,7 @@ which provides a C<text> method to get the text of the usage message and C<die>
 to die with it.  For more methods and options, consults the documentation for
 the Usage class.
 
-=head3 usage_desc
+=head3 $usage_desc
 
 The C<$usage_desc> parameter to C<describe_options> is a C<sprintf>-like string
 that is used in generating the first line of the usage message.  It's a
@@ -104,7 +104,7 @@ expected to follow the program's options, and is entirely free-form.
 Literal C<%> characters will need to be written as C<%%>, just like with
 C<sprintf>.
 
-=head3 opt_spec
+=head3 @opt_spec
 
 The C<@opt_spec> part of the args to C<describe_options> is used to configure
 option parsing and to produce the usage message.  Each entry in the list is an
@@ -220,7 +220,7 @@ callbacks.)
 
 =back
 
-=head3 arg
+=head3 %arg
 
 The C<%arg> to C<describe_options> is optional.  If the last parameter is a
 hashref, it contains extra arguments to modify the way C<describe_options>
