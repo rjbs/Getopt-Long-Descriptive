@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+0.085   2010-03-13
+        rewrite much of the documentation
+
 0.084   2010-02-14
         prevent auto-enabling of auto_help (Thanks, DOUGDUDE)
 

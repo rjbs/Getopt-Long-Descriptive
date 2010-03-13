@@ -2,7 +2,7 @@ package Getopt::Long::Descriptive::Usage;
 use strict;
 use warnings;
 
-our $VERSION = '0.084';
+our $VERSION = '0.085';
 
 use List::Util qw(max);
 
