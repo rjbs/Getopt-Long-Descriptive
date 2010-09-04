@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 38;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -251,4 +251,25 @@ is_opt(
 
   is($opt->foo_bar, 1, 'given value (checked with method)');
   is($opt->foo,     1, 'implied value (checked with method)');
+}
+
+{
+  local @ARGV;
+  my ($opt, $usage) = describe_options(
+    "%c %o",
+    [ foo => "a foo option" ],
+    [ bar => "a bar option" ],
+    [ baz => "a baz option with a very long description."
+             . " It just goes on for a really long time."
+             . " This allows us to test line wrapping and"
+             . " make sure the output always looks spiffy" ],
+  );
+
+  my $expect = qr/
+	--baz    a baz option with a very long description. It just goes on
+	         for a really long time. This allows us to test line wrapping
+	         and make sure the output always looks spiffy/;
+
+
+  like($usage->text, $expect, 'long option description is wrapped cleanly');
 }

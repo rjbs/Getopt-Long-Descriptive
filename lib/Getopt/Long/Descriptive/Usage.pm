@@ -100,10 +100,37 @@ sub option_text {
     $spec = Getopt::Long::Descriptive->_strip_assignment($spec);
     $spec = join " ", reverse map { length > 1 ? "--$_" : "-$_" }
                               split /\|/, $spec;
-    $string .= sprintf "$spec_fmt  %s\n", $spec, $desc;
+
+    my @desc = $self->_split_description($length, $desc);
+
+    $string .= sprintf "$spec_fmt  %s\n", $spec, shift @desc;
+    for my $line (@desc) {
+        $string .= "\t";
+        $string .= q{ } x ( $length + 2 );
+        $string .= "$line\n";
+    }
   }
 
   return $string;
+}
+
+sub _split_description {
+  my ($self, $length, $desc) = @_;
+
+  # 8 for a tab, 2 for the space between option & desc;
+  my $max_length = 78 - ( $length + 8 + 2 );
+
+  return $desc if length $desc <= $max_length;
+
+  my @lines;
+  while (length $desc > $max_length) {
+    my $idx = rindex( substr( $desc, 0, $max_length ), q{ }, );
+    push @lines, substr($desc, 0, $idx);
+    substr($desc, 0, $idx + 1) = q{};
+  }
+  push @lines, $desc;
+
+  return @lines;
 }
 
 =head2 warn
