@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 package Getopt::Long::Descriptive;
 
 use Carp qw(carp croak);
@@ -17,11 +18,11 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-Version 0.085
+Version 0.086
 
 =cut
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 =head1 SYNOPSIS
 
@@ -285,7 +286,9 @@ sub _expand {
     spec       => $_->[0] || '',
     desc       => @$_ > 1 ? $_->[1] : 'spacer',
     constraint => $_->[2] || {},
-    name       => _munge((split /[:=|!+]/, $_->[0] || '')[0]),
+
+    # if @$_ is 0 then we got [], a spacer
+    name       => @$_ ? _munge((split /[:=|!+]/, $_->[0] || '')[0]) : '',
   )} } @_;
 }
     
