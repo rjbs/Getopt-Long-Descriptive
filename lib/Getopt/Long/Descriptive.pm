@@ -256,7 +256,7 @@ BEGIN {
 }
 
 use Sub::Exporter::Util ();
-use Sub::Exporter -setup => {
+use Sub::Exporter 0.972 -setup => {
   exports => [
     describe_options => \'_build_describe_options',
     q(prog_name),

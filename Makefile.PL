@@ -12,7 +12,7 @@ WriteMakefile(
     'Getopt::Long'     => 2.33, # !-options get --no-X
     'List::Util'       => 0,
     'Params::Validate' => '0.74',
-    'Sub::Exporter'    => 0,
+    'Sub::Exporter'    => 0.972, # generator name with \'name'
     'Test::More'       => 0,
   },
   dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
