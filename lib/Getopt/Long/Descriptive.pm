@@ -18,11 +18,11 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-Version 0.087
+Version 0.088
 
 =cut
 
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 40;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -273,3 +273,20 @@ is_opt(
 
   like($usage->text, $expect, 'long option description is wrapped cleanly');
 }
+
+{
+  local @ARGV;
+  my ($opt, $usage) = describe_options(
+    "%c %o",
+    [ foo => "x" x 80 ],
+  );
+  local $@;
+  local $SIG{ALRM} = sub { die "ALRM\n" };
+  eval {
+    alarm(2);
+    like($usage->text, qr/@{["x" x 80]}/, "handled unwrappable description");
+    alarm(0);
+  };
+  is($@, '', "no error in eval");
+}
+

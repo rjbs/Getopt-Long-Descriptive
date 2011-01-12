@@ -2,7 +2,7 @@ package Getopt::Long::Descriptive::Usage;
 use strict;
 use warnings;
 
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 
 use List::Util qw(max);
 
@@ -125,6 +125,7 @@ sub _split_description {
   my @lines;
   while (length $desc > $max_length) {
     my $idx = rindex( substr( $desc, 0, $max_length ), q{ }, );
+    last unless $idx >= 0;
     push @lines, substr($desc, 0, $idx);
     substr($desc, 0, $idx + 1) = q{};
   }

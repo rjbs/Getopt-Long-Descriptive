@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+0.088   2011-01-12
+        fix infinite loop when long option documentation strings couldn't wrap
+
 0.087   2010-11-30
         long option documentation strings are now line-wrapped and aligned
         correctly (Dave Rolsky)
