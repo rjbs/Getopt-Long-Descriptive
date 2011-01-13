@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+0.089   2011-01-13
+        bump version to deal with busted PAUSE indexing
+
 0.088   2011-01-12
         fix infinite loop when long option documentation strings couldn't wrap
         (HDP)
