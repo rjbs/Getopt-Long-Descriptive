@@ -1,14 +1,9 @@
-package Getopt::Long::Descriptive::Usage;
 use strict;
 use warnings;
-
-our $VERSION = '0.089';
+package Getopt::Long::Descriptive::Usage;
+# ABSTRACT: the usage description for GLD
 
 use List::Util qw(max);
-
-=head1 NAME
-
-Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 SYNOPSIS
 
@@ -158,7 +153,7 @@ message with no line breaks, so supply this if you need them.
 
 =cut
 
-sub die  { 
+sub die  {
   my $self = shift;
   my $arg  = shift || {};
 
@@ -178,25 +173,5 @@ use overload (
     return sub { return $_[0] ? $self->text : $self->warn; };
   }
 );
-
-=head1 AUTHOR
-
-Hans Dieter Pearcey, C<< <hdp@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Getopt-Long-Descriptive>.  I
-will be notified, and then you'll automatically be notified of progress on your
-bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2005 Hans Dieter Pearcey, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=cut
 
 1;

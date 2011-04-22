@@ -1,28 +1,17 @@
 use strict;
 use warnings;
 package Getopt::Long::Descriptive;
+# ABSTRACT: Getopt::Long, but simpler and more powerful
 
 use Carp qw(carp croak);
 use File::Basename ();
 use Getopt::Long 2.33;
 use List::Util qw(first);
-use Params::Validate qw(:all);
+use Params::Validate 0.97 qw(:all);
 use Scalar::Util ();
 
 use Getopt::Long::Descriptive::Opts;
 use Getopt::Long::Descriptive::Usage;
-
-=head1 NAME
-
-Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
-
-=head1 VERSION
-
-Version 0.089
-
-=cut
-
-our $VERSION = '0.089';
 
 =head1 SYNOPSIS
 
@@ -291,7 +280,7 @@ sub _expand {
     name       => @$_ ? _munge((split /[:=|!+]/, $_->[0] || '')[0]) : '',
   )} } @_;
 }
-    
+
 my %HIDDEN = (
   hidden => 1,
 );
@@ -327,7 +316,7 @@ sub _build_describe_options {
     my %method_map;
     for my $opt (_expand(@_)) {
       $method_map{ $opt->{name} } = undef unless $opt->{desc} eq 'spacer';
- 
+
       if (ref($opt->{desc}) eq 'ARRAY') {
         $opt->{constraint}->{one_of} = delete $opt->{desc};
         $opt->{desc} = 'hidden';
@@ -353,7 +342,7 @@ sub _build_describe_options {
       }
       push @opts, $opt;
     }
-    
+
     my @go_conf = @{ $arg->{getopt_conf} || $arg->{getopt} || [] };
     if ($arg->{getopt}) {
       warn "describe_options: 'getopt' is deprecated, please use 'getopt_conf' instead\n";
@@ -375,7 +364,7 @@ sub _build_describe_options {
       map   { split /\|/ }
       map   { __PACKAGE__->_strip_assignment($_) }
       @specs;
-    
+
     my $long = grep /\b[^|]{2,}/, @specs;
 
     my %replace = (
@@ -481,7 +470,7 @@ sub _validate_with {
     $arg{params}{$arg{name}} = delete $pvspec{default};
   }
 
-  my %p = eval { 
+  my %p = eval {
     validate_with(
       params => [ %{$arg{params}} ],
       spec   => { $arg{name} => \%pvspec },
@@ -499,7 +488,7 @@ sub _validate_with {
 
     die $@;
   }
-      
+
   return $p{$arg{name}};
 }
 
@@ -572,29 +561,9 @@ to Getopt::Long::Descriptive::Usage.
 
 =head1 SEE ALSO
 
-L<Getopt::Long>
-L<Params::Validate>
-
-=head1 AUTHORS
-
-Hans Dieter Pearcey, C<< <hdp@cpan.org> >>
-
-Ricardo Signes, C<< <rjbs@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-getopt-long-descriptive@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Getopt-Long-Descriptive>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2005 Hans Dieter Pearcey, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+=for :list
+* L<Getopt::Long>
+* L<Params::Validate>
 
 =cut
 

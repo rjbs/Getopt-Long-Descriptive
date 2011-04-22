@@ -1,20 +1,9 @@
 use strict;
 use warnings;
 package Getopt::Long::Descriptive::Opts;
+# ABSTRACT: object representing command line switches
 
 use Scalar::Util qw(blessed weaken);
-
-=head1 NAME
-
-Getopt::Long::Descriptive::Opts - object representing command line switches
-
-=head1 VERSION
-
-Version 0.089
-
-=cut
-
-our $VERSION = '0.089';
 
 =head1 DESCRIPTION
 
@@ -73,7 +62,7 @@ sub _specified_opts {
   my %opts;
   @opts{ @keys } = @$self{ @keys };
 
-  $meta->{specified_opts} = \%opts; 
+  $meta->{specified_opts} = \%opts;
 
   bless $meta->{specified_opts} => $class;
   weaken $meta->{specified_opts};
@@ -120,7 +109,7 @@ sub ___class_for_opt {
 
 sub ___new_opt_obj {
   my ($class, $arg) = @_;
-  
+
   my $copy = { %{ $arg->{values} } };
 
   my $new_class = $class->___class_for_opt($arg);
@@ -141,26 +130,5 @@ sub ___new_opt_obj {
 
   return $self;
 }
-
-=head1 AUTHOR
-
-Hans Dieter Pearcey, C<< <hdp@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-getopt-long-descriptive@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Getopt-Long-Descriptive>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2005 Hans Dieter Pearcey, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=cut
 
 1;
