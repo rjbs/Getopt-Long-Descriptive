@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.090     2011-04-21 20:43:07 America/New_York
         bump prereq on Params::Validate to deal with recent buggy versions
 
 0.089   2011-01-13
