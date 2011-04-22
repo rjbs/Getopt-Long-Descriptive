@@ -1,5 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
+{{$NEXT}}
+        bump prereq on Params::Validate to deal with recent buggy versions
+
 0.089   2011-01-13
         bump version to deal with busted PAUSE indexing
 
