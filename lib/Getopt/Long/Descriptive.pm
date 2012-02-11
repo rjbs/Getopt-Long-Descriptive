@@ -37,7 +37,7 @@ use Getopt::Long::Descriptive::Usage;
   my-program [-psv] [long options...] <some-arg>
     -s --server     the server to connect to
     -p --port       the port to connect to
-                  
+
     -v --verbose    print extra stuff
     --help          print usage message and exit
 
@@ -483,6 +483,30 @@ sub _validate_with {
       my $missing = $1;
       $arg{usage}->die({
         pre_text => "Required option missing: $1\n",
+      });
+    }
+
+    # These error strings were culled from the source for Params::Validate::PP
+    # These are quick and dirty regexes. It should be easy to refine them the
+    # more they are used.
+
+    my $err_str = join '|', (
+      'Odd number of parameters in call to ',
+      'The following parameter\(s\)\? ',
+      '.* has a type specification which is not a number\. It is ',
+      '.* which is not one of the allowed types: ',
+      '.* was not .*?\(it is',
+      '.* does not have the method: ',
+      "'callbacks' validation parameter for ",
+      "callback '.*?' for .*? is not a subroutine reference",
+      ".* did not pass the '.*?' callback",
+      '.* did not pass regex check',
+    );
+
+    if ($@ =~ /^($err_str)\n/m ) {
+      my $msg = $1;
+      $arg{usage}->die({
+        pre_text => "$msg\n",
       });
     }
 
