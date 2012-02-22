@@ -470,20 +470,28 @@ sub _validate_with {
     $arg{params}{$arg{name}} = delete $pvspec{default};
   }
 
-  my $fail_msg;
-
-  my %p = eval {
-    validate_with(
+  my %p;
+  my $ok = eval {
+    %p = validate_with(
       params => [ %{$arg{params}} ],
       spec   => { $arg{name} => \%pvspec },
       allow_extra => 1,
-      on_fail => sub { $fail_msg = shift ; die "check fail_msg\n" },
+      on_fail     => sub {
+        my $fail_msg = shift;
+        Getopt::Long::Descriptive::_PV_Error->throw($fail_msg);
+      },
     );
+    1;
   };
 
-  if ($@) {
-    $arg{usage}->die({ pre_text => $fail_msg })
-      if $@ =~ qr/check fail_msg/;
+  if (! $ok) {
+    my $error = $@;
+    if (
+      Scalar::Util::blessed($error)
+      && $error->isa('Getopt::Long::Descriptive::_PV_Error')
+    ) {
+      $arg{usage}->die({ pre_text => $error->error . "\n" });
+    }
 
     die $@;
   }
@@ -540,6 +548,18 @@ sub _mk_implies {
 
 sub _mk_only_one {
   die "unimplemented";
+}
+
+{
+  package
+    Getopt::Long::Descriptive::_PV_Error;
+  sub error { $_[0]->{error} }
+  sub throw {
+    my ($class, $error_msg) = @_;
+    my $self = { error => $error_msg };
+    bless $self, $class;
+    die $self;
+  }
 }
 
 =head1 CUSTOMIZING
