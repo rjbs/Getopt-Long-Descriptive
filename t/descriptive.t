@@ -152,7 +152,7 @@ is_opt(
       required => 1
     } ],
   ],
-  qr/a required option/,
+  qr/mandatory parameter/i,
   "required option -- help text"
 );
 
