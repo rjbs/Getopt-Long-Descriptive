@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.091     2012-02-22 18:15:08 America/New_York
           don't die quite so violently when a Params::Validate constraint fails
           (initial patch by harleypig@github; final blame to RJBS)
 
