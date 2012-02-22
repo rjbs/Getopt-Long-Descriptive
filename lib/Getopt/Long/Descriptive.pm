@@ -37,7 +37,7 @@ use Getopt::Long::Descriptive::Usage;
   my-program [-psv] [long options...] <some-arg>
     -s --server     the server to connect to
     -p --port       the port to connect to
-                  
+
     -v --verbose    print extra stuff
     --help          print usage message and exit
 
@@ -470,21 +470,20 @@ sub _validate_with {
     $arg{params}{$arg{name}} = delete $pvspec{default};
   }
 
+  my $fail_msg;
+
   my %p = eval {
     validate_with(
       params => [ %{$arg{params}} ],
       spec   => { $arg{name} => \%pvspec },
       allow_extra => 1,
+      on_fail => sub { $fail_msg = shift ; die "check fail_msg\n" },
     );
   };
 
   if ($@) {
-    if ($@ =~ /^Mandatory parameter '([^']+)' missing/) {
-      my $missing = $1;
-      $arg{usage}->die({
-        pre_text => "Required option missing: $1\n",
-      });
-    }
+    $arg{usage}->die({ pre_text => $fail_msg })
+      if $@ =~ qr/check fail_msg/;
 
     die $@;
   }
