@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 40;
+use Test::More tests => 42;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -16,7 +16,7 @@ use_ok("Getopt::Long::Descriptive");
 sub is_opt {
   my ($argv, $specs, $expect, $desc) = @_;
   local @ARGV = @$argv;
-  eval { 
+  eval {
     my ($opt, $usage) = describe_options(
       "test %o",
       @$specs,
@@ -30,7 +30,7 @@ sub is_opt {
     for my $key (keys %$expect) {
       is($opt->$key, $expect->{$key}, "...->$key");
     }
-  }; 
+  };
   if ($@) {
     chomp($@);
     if (ref($expect) eq 'Regexp') {
@@ -86,17 +86,24 @@ is_hidden(
   qr/a bar option/,
 );
 
+is_opt(
+  [ '--nora' ],
+  [ [ "nora", "Invisible Nora", { hidden => 1 } ] ],
+  { nora => 1 },
+  "",
+);
+
 ### tests for one_of
 
-my $foobar = [ 
+my $foobar = [
   [ 'foo' => 'a foo option' ],
   [ 'bar' => 'a bar option' ],
 ];
 
 is_opt(
   [ ],
-  [ 
-    [ 
+  [
+    [
       mode => $foobar, { default => 'foo' },
     ],
   ],
