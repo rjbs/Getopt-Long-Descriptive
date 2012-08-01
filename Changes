@@ -2,6 +2,9 @@ Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
 
+0.092     2012-07-31 22:51:09 America/New_York
+          make "hidden" options usable on their own (thanks, Roman Hubacek!)
+
 0.091     2012-02-22 18:15:08 America/New_York
           don't die quite so violently when a Params::Validate constraint fails
           (initial patch by harleypig@github; final blame to RJBS)
