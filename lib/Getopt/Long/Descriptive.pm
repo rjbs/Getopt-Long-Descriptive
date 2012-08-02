@@ -19,8 +19,8 @@ use Getopt::Long::Descriptive::Usage;
 
   my ($opt, $usage) = describe_options(
     'my-program %o <some-arg>',
-    [ 'server|s=s', "the server to connect to"                  ],
-    [ 'port|p=i',   "the port to connect to", { default => 79 } ],
+    [ 'server|s=s', "the server to connect to", { required => 1  } ],
+    [ 'port|p=i',   "the port to connect to",   { default  => 79 } ],
     [],
     [ 'verbose|v',  "print extra stuff"            ],
     [ 'help',       "print usage message and exit" ],
