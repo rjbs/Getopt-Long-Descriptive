@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.093     2012-11-01 15:55:35 America/New_York
           bogus %-codes in usage description are now noticed and fatal
 
 0.092     2012-07-31 22:51:09 America/New_York
