@@ -383,7 +383,12 @@ sub _build_describe_options {
       ),
     );
 
-    (my $str = $format) =~ s/%(.)/$replace{$1}/ge;
+    (my $str = $format) =~ s<%(.)><
+      defined $replace{$1}
+      ? $replace{$1}
+      : Carp::croak("unknown sequence %$1 in first argument to describe_options")
+    >ge;
+
     $str =~ s/\s{2,}/ /g;
 
     my $usage = $class->usage_class->new({
