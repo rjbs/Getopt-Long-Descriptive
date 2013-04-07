@@ -310,6 +310,14 @@ sub _strip_assignment {
 
   (my $copy = $str) =~ s{$SPEC_RE}{};
 
+  if (wantarray) {
+      my $len = length $copy;
+      my $assignment = substr $str, $len;
+      if (!defined($assignment)) {
+          $assignment = '';
+      }
+      return ($copy, $assignment);
+  }
   return $copy;
 }
 
@@ -396,7 +404,7 @@ sub _build_describe_options {
       sort  { lc $a cmp lc $b or $a cmp $b }
       grep  { /^.$/ }
       map   { split /\|/ }
-      map   { __PACKAGE__->_strip_assignment($_) }
+      map   { scalar __PACKAGE__->_strip_assignment($_) }
       @specs;
 
     my $long = grep /\b[^|]{2,}/, @specs;
