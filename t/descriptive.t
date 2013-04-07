@@ -273,9 +273,9 @@ is_opt(
   );
 
   my $expect = qr/
-	--baz    a baz option with a very long description. It just goes on
-	         for a really long time. This allows us to test line wrapping
-	         and make sure the output always looks spiffy/;
+	--baz   a baz option with a very long description. It just goes on
+	        for a really long time. This allows us to test line wrapping
+	        and make sure the output always looks spiffy/;
 
 
   like($usage->text, $expect, 'long option description is wrapped cleanly');
