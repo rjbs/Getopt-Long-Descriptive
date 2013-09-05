@@ -59,8 +59,10 @@ C<describe_options>.  All GLD's exports are exported by L<Sub::Exporter>.
 
   my ($opt, $usage) = describe_options($usage_desc, @opt_spec, \%arg);
 
-This routine inspects C<@ARGV> returns the options given and a object
-for generating usage messages.
+This routine inspects C<@ARGV> for options that match the supplied spec. If all
+the options are valid then it returns the options given and an object for
+generating usage messages; if not then it dies with an explanation of what was
+wrong and a usage message.
 
 The C<$opt> object will be a dynamically-generated subclass of
 L<Getopt::Long::Descriptive::Opts>.  In brief, each of the options in
