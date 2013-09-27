@@ -2,6 +2,9 @@ Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
 
+0.095     2013-09-26 20:32:55 America/New_York
+        - add the "shortcircuit" option option (thanks, Diab Jerius!)
+
 0.094     2013-09-05 09:35:26 America/New_York
         - update documentation to note that failed validation is fatal (thanks,
           SMYLERS)
