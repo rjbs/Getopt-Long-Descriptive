@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Warnings qw[ warning ];
+use Test::Warnings 0.005 qw[ warning ];
 use Test::Fatal;
 
 use Getopt::Long::Descriptive;
