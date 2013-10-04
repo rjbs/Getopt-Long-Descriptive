@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.096     2013-10-04 08:03:12 America/New_York
         - update version of Test::Warnings required
           (thanks, Alexandr Ciornii!)
 
