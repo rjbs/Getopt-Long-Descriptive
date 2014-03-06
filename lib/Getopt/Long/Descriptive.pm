@@ -416,7 +416,7 @@ sub _build_describe_options {
       : Carp::croak("unknown sequence %$1 in first argument to describe_options")
     >ge;
 
-    $str =~ s/\s{2,}/ /g;
+    $str =~ s/[\x20\t]{2,}/ /g;
 
     my $usage = $class->usage_class->new({
       options       => [ _nohidden(@opts) ],
