@@ -216,6 +216,11 @@ constraints.  This provides a way of specifying C<--help> style options.
 
 In addition, any constraint understood by Params::Validate may be used.
 
+For example, to accept positive integers:
+
+  [ 'max-iterations=i', "maximum number of iterations",
+    { callbacks => { positive => sub { shift() > 0 } } } ],
+
 (Internally, all constraints are translated into Params::Validate options or
 callbacks.)
 
