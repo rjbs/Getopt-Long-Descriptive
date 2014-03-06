@@ -37,7 +37,7 @@ Valid arguments are:
 sub new {
   my ($class, $arg) = @_;
 
-  my @to_copy = qw(options leader_text);
+  my @to_copy = qw(options leader_text show_defaults);
 
   my %copy;
   @copy{ @to_copy } = @$arg{ @to_copy };
@@ -97,6 +97,12 @@ sub option_text {
                               split /\|/, $spec;
 
     my @desc = $self->_split_description($length, $desc);
+
+    # add default value if it exists
+    if ( $opt->{constraint}->{default} and $self->{show_defaults}) {
+      my $dflt = $opt->{constraint}->{default};
+      push @desc, "(default value: $dflt)";
+    }
 
     $string .= sprintf "$spec_fmt  %s\n", $spec, shift @desc;
     for my $line (@desc) {

@@ -227,7 +227,10 @@ The C<%arg> to C<describe_options> is optional.  If the last parameter is a
 hashref, it contains extra arguments to modify the way C<describe_options>
 works.  Valid arguments are:
 
-  getopt_conf - an arrayref of strings, passed to Getopt::Long::Configure
+  getopt_conf   - an arrayref of strings, passed to Getopt::Long::Configure
+  show_defaults - a boolean which controls whether an option's default
+                  value (if applicable) is shown as part of the usage message
+                  (for backward compatibility this defaults to false)
 
 =head2 prog_name
 
@@ -411,8 +414,9 @@ sub _build_describe_options {
     $str =~ s/\s{2,}/ /g;
 
     my $usage = $class->usage_class->new({
-      options     => [ _nohidden(@opts) ],
-      leader_text => $str,
+      options       => [ _nohidden(@opts) ],
+      leader_text   => $str,
+      show_defaults => $arg->{show_defaults},
     });
 
     Getopt::Long::Configure(@go_conf);
