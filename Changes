@@ -1,6 +1,7 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - when showing defaults, show false ones, too
 
 0.097     2014-03-05 21:57:32-05:00 America/New_York
         - explicitly make the default behavior case-sensitive

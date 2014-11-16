@@ -99,8 +99,11 @@ sub option_text {
     my @desc = $self->_split_description($length, $desc);
 
     # add default value if it exists
-    if ( $opt->{constraint}->{default} and $self->{show_defaults}) {
+    if (exists $opt->{constraint}->{default} and $self->{show_defaults}) {
       my $dflt = $opt->{constraint}->{default};
+      $dflt = ! defined $dflt ? '(undef)'
+            : ! length  $dflt ? '(empty string)'
+            :                   $dflt;
       push @desc, "(default value: $dflt)";
     }
 
