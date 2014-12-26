@@ -110,12 +110,12 @@ sub option_text {
 
 sub _option_length {
     my ($fullspec) = @_;
-    my $arglen = 0;
     my $number_opts = 1;
     my $last_pos = 0;
     my $number_shortopts = 0;
     my ($spec, $argspec) = Getopt::Long::Descriptive->_strip_assignment($fullspec);
     my $length = length $spec;
+    my $arglen = length(_parse_assignment($argspec));
 
     # Spacing rules:
     #
@@ -139,16 +139,6 @@ sub _option_length {
     # Was the last option a "short" one?
     if ($length - $last_pos == 2) {
         $number_shortopts++;
-    }
-
-    # Do we have an argument specifier (ignoring "!" and "+")
-    if (length($argspec) >= 2) {
-        # yes, 2 for the argument
-        $arglen = 2;
-        if (substr($argspec, 0, 1) eq ':') {
-            # argument is optional, add another 2 for []
-            $arglen += 2;
-        }
     }
 
     # We got $number_opts options, each with an argument length of
@@ -188,15 +178,27 @@ sub _split_description {
 sub _parse_assignment {
     my ($assign_spec) = @_;
     my $argument;
-    my $result = 'X';
+    my $result = 'STR';
+    my $desttype;
     if (length($assign_spec) < 2) {
         # empty, ! or +
         return '';
     }
 
     $argument = substr $assign_spec, 1, 2;
-    if ($argument eq 'i') {
-        $result = 'N';
+    if ($argument eq 'i' or $argument eq 'o') {
+        $result = 'INT';
+    } elsif ($argument eq 'f') {
+        $result = 'NUM';
+    }
+    if (length($assign_spec) > 2) {
+        $desttype = substr($assign_spec, 2, 1);
+        if ($desttype eq '@') {
+            # Imply it can be repeated
+            $result .= '...';
+        } elsif ($desttype eq '%') {
+            $result = "KEY=${result}...";
+        }
     }
     if (substr($assign_spec, 0, 1) eq ':') {
         return "[=$result]";
