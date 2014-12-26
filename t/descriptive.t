@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 46;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -204,6 +204,40 @@ is_opt(
     $usage->text,
     qr/\[-bhiloSs\]/,
     "short options",
+  );
+}
+
+{
+  local @ARGV;
+  my ($opt, $usage) = describe_options(
+    "%c %o",
+    [ 'string|s=s'   => "string value" ],
+    [ 'ostring|S:s'  => "optional string value" ],
+    [ 'list|l=s@'    => "list of strings" ],
+    [ 'hash|h=s%'    => "hash values" ],
+    [ 'optional|o!'  => "optional" ],
+    [ 'increment|i+' => "incremental option" ],
+  );
+  my $usage_text = $usage->text;
+  like(
+    $usage_text,
+    qr/-s STR --string STR\s+string value/,
+    "Spec =s gets an STR in usage output",
+  );
+  like(
+    $usage_text,
+    qr/-S\[=STR\] --ostring\[=STR\]\s+optional string value/,
+    "Spec :s gets an STR in usage output",
+  );
+  like(
+    $usage_text,
+    qr/-l STR\Q...\E --list STR\Q...\E\s+list of strings/,
+    "Spec =s@ gets an STR... in usage output",
+  );
+  like(
+    $usage_text,
+    qr/-h KEY=STR\Q...\E --hash KEY=STR\Q...\E\s+hash values/,
+    "Spec =s% gets an KEY=STR... in usage output",
   );
 }
 
