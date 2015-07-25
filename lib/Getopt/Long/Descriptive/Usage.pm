@@ -146,21 +146,19 @@ sub _option_length {
     }
 
     # Was the last option a "short" one?
-    if ($length - $last_pos == 2) {
+    if ($length - $last_pos == 1) {
         $number_shortopts++;
     }
 
     # We got $number_opts options, each with an argument length of
     # $arglen.  Plus each option (after the first) needs 3 a char
     # spacing.  $length gives us the total length of all options and 1
-    # char spacing per option (after the first).  It does not account
-    # for argument length and we want (at least) one additional char
-    # for space before the description.  So the result should be:
+    # char spacing per option (after the first).  So the result should be:
 
     my $number_longopts = $number_opts - $number_shortopts;
     my $total_arglen = $number_opts * $arglen;
     my $total_optsep = 2 * $number_longopts + $number_shortopts;
-    my $total = $length + $total_optsep + $total_arglen + 1;
+    my $total = $length + $total_optsep + $total_arglen;
     return $total;
 }
 
