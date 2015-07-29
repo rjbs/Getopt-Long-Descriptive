@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 46;
+use Test::More tests => 58;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -331,3 +331,21 @@ is_opt(
   is($@, '', "no error in eval");
 }
 
+{
+  my $p = \&Getopt::Long::Descriptive::Usage::_parse_assignment;
+
+  is ($p->('=s'), ' STR', 'string');
+  is ($p->('=i'), ' INT', 'int (i)');
+  is ($p->('=o'), ' INT', 'int (o)');
+  is ($p->('=f'), ' NUM', 'float');
+
+  is ($p->('=s@'), ' STR...', 'strings');
+  is ($p->('=i@'), ' INT...', 'ints (i)');
+  is ($p->('=o@'), ' INT...', 'ints (o)');
+  is ($p->('=f@'), ' NUM...', 'floats');
+
+  is ($p->('=s%'), ' KEY=STR...', 'string maps');
+  is ($p->('=i%'), ' KEY=INT...', 'int maps (i)');
+  is ($p->('=o%'), ' KEY=INT...', 'int maps (o)');
+  is ($p->('=f%'), ' KEY=NUM...', 'float maps');
+}
