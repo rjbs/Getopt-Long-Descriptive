@@ -193,9 +193,9 @@ sub _parse_assignment {
     }
 
     $argument = substr $assign_spec, 1, 2;
-    if ($argument eq 'i' or $argument eq 'o') {
+    if ($argument =~ m/^i/ or $argument =~ m/^o/) {
         $result = 'INT';
-    } elsif ($argument eq 'f') {
+    } elsif ($argument =~ m/^f/) {
         $result = 'NUM';
     }
     if (length($assign_spec) > 2) {
