@@ -23,7 +23,7 @@ use Getopt::Long::Descriptive::Usage;
     [ 'port|p=i',   "the port to connect to",   { default  => 79 } ],
     [],
     [ 'verbose|v',  "print extra stuff"            ],
-    [ 'help',       "print usage message and exit" ],
+    [ 'help',       "print usage message and exit", { shortcircuit => 1 } ],
   );
 
   print($usage->text), exit if $opt->help;
