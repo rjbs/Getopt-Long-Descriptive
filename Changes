@@ -1,6 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.100     2016-07-11 22:21:26-04:00 America/New_York
+        - show off "shortcircuit" in synopsis (thanks, Zhenyi Zhou)
         - Fix rendering of complex types ('i@' → 'INT...', etc)
           (thanks, Arthur Axel fREW Schmidt)
 
