@@ -338,6 +338,8 @@ sub _build_describe_options {
     my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
     my @opts;
 
+    my %parent_of;
+
     # special casing
     # wish we had real loop objects
     my %method_map;
@@ -355,6 +357,7 @@ sub _build_describe_options {
         for my $one_opt (_expand(
           @{delete $opt->{constraint}->{one_of}}
         )) {
+          $parent_of{$one_opt->{name}} = $opt->{name};
           $one_opt->{constraint}->{implies}
             ->{$opt->{name}} = $one_opt->{name};
           for my $wipe (qw(required default)) {
@@ -459,6 +462,8 @@ sub _build_describe_options {
         spec   => $copt->{constraint},
         opts   => \@opts,
         usage  => $usage,
+        given_keys => \@given_keys,
+        parent_of  => \%parent_of,
       );
       next unless (defined($new) || exists($return{$name}));
       $return{$name} = $new;
@@ -493,7 +498,10 @@ sub _validate_with {
     spec   => 1,
     opts   => 1,
     usage  => 1,
+    given_keys => 1,
+    parent_of  => 1,
   });
+
   my $spec = $arg{spec};
   my %pvspec;
   for my $ct (keys %{$spec}) {
@@ -532,7 +540,11 @@ sub _validate_with {
   my %p;
   my $ok = eval {
     %p = validate_with(
-      params => [ %{$arg{params}} ],
+      params => [
+        %{$arg{params}},
+        '-given_keys', $arg{given_keys},
+        '-parent_of',  $arg{parent_of},
+      ],
       spec   => { $arg{name} => \%pvspec },
       allow_extra => 1,
       on_fail     => sub {
@@ -586,13 +598,29 @@ sub _mk_implies {
   my $whatstr = join(q{, }, map { "$_=$what->{$_}" } keys %$what);
 
   return "$name implies $whatstr" => sub {
-    my ($pv_val) = shift;
+    my ($pv_val, $rest) = @_;
 
     # negatable options will be 0 here, which is ok.
     return 1 unless defined $pv_val;
 
     while (my ($key, $val) = each %$what) {
-      if (exists $param->{$key} and $param->{$key} ne $val) {
+      # Really, this should be called "-implies" and should include all implies
+      # relationships, but they'll have to get handled by setting conflicts.
+      my $parent   = $rest->{'-parent_of'}{$name};
+      my @siblings = $parent
+                   ? (grep {; defined $rest->{'-parent_of'}{$_}
+                              && $rest->{'-parent_of'}{$_} eq $parent }
+                      @{ $rest->{'-given_keys'} })
+                   : ();
+
+      if (@siblings > 1) {
+        die "these options conflict; each wants to set the $parent: @siblings\n";
+      }
+
+      if (  exists $param->{$key}
+        and $param->{$key} ne $val
+        and grep {; $_ eq $key } @{ $rest->{'-given_keys'} }
+      ) {
         die(
           "option specification for $name implies that $key should be "
           . "set to '$val', but it is '$param->{$key}' already\n"

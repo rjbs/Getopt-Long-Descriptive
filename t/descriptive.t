@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 58;
+use Test::More;
 
 use_ok("Getopt::Long::Descriptive");
 
@@ -16,7 +16,9 @@ use_ok("Getopt::Long::Descriptive");
 sub is_opt {
   my ($argv, $specs, $expect, $desc) = @_;
   local @ARGV = @$argv;
-  eval {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my $ok = eval {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($opt, $usage) = describe_options(
       "test %o",
       @$specs,
@@ -30,14 +32,19 @@ sub is_opt {
     for my $key (keys %$expect) {
       is($opt->$key, $expect->{$key}, "...->$key");
     }
+
+    1
   };
-  if ($@) {
-    chomp($@);
+
+  unless ($ok) {
+    my $error = $@;
+    chomp $error;
+
     if (ref($expect) eq 'Regexp') {
-      like($@, $expect, $desc);
+      like($error, $expect, $desc);
     } else {
       # auto-fail
-      is($@, "", "$desc: $@");
+      is($error, "", "$desc: $error");
     }
   }
 }
@@ -122,6 +129,17 @@ is_opt(
   "basic usage, passed-in",
 );
 
+# implies should override default, github #12
+is_opt(
+  [ '--beta' ],
+  [
+    [ alfa => 'default off',  { default => 0 } ],
+    [ beta => 'implies alfa', { default => 0, implies => 'alfa' } ],
+  ],
+  { alfa => 1, beta => 1 },
+  "implies A overrides A's default",
+);
+
 # implicit hidden syntax
 is_hidden(
   [ [ mode => [] ] ],
@@ -133,7 +151,7 @@ is_opt(
   [ '--foo', '--bar' ],
   [ [ mode => $foobar ] ],
   #qr/\Qonly one 'mode' option (foo, bar)\E/,
-  qr/it is 'foo' already/,
+  qr/options conflict/,
   "only one 'mode' option",
 );
 
@@ -349,3 +367,5 @@ is_opt(
   is ($p->('=o%'), ' KEY=INT...', 'int maps (o)');
   is ($p->('=f%'), ' KEY=NUM...', 'float maps');
 }
+
+done_testing;
