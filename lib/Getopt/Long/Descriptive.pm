@@ -226,6 +226,18 @@ callbacks.)
 
 =back
 
+=head3 User-defined option handlers
+
+If the third element is a code reference, then it is used as a callback.
+
+If the first element is C<< <> >>, and the second or third is a code reference,
+then L<Getopt::Long>'s catch-all will be enabled.
+
+For more information, see the I<User-defined subroutines> and 
+I<Argument callback> sections of the L<Getopt::Long> documentation.
+
+=back
+
 =head3 %arg
 
 The C<%arg> to C<describe_options> is optional.  If the last parameter is a
@@ -337,6 +349,7 @@ sub _build_describe_options {
     my $format = shift;
     my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
     my @opts;
+    my %getopt_callbacks; # For call-back handler support.
 
     my %parent_of;
 
@@ -344,7 +357,16 @@ sub _build_describe_options {
     # wish we had real loop objects
     my %method_map;
     for my $opt (_expand(@_)) {
-      $method_map{ $opt->{name} } = undef unless $opt->{desc} eq 'spacer';
+      $method_map{ $opt->{name} } = undef unless $opt->{desc} eq 'spacer' || $opt->{spec} eq '<>';
+      
+      if (ref($opt->{constraint}) eq 'CODE') { # Allow for call-back handlers.
+        $getopt_callbacks{ $opt->{spec} } = $opt->{constraint};
+        delete $opt->{constraint};
+      }
+      if ($opt->{name} eq '<>') { # Allow for catch-all call-back handler.
+        $getopt_callbacks{ $opt->{spec} } = $opt->{desc} if ref($opt->{desc}) eq 'CODE';
+        next;
+      }
 
       if (ref($opt->{desc}) eq 'ARRAY') {
         $opt->{constraint}->{one_of} = delete $opt->{desc};
@@ -438,7 +460,7 @@ sub _build_describe_options {
     Getopt::Long::Configure(@go_conf);
 
     my %return;
-    $usage->die unless GetOptions(\%return, grep { length } @getopt_specs);
+    $usage->die unless GetOptions(\%return, (grep { length } @getopt_specs), %getopt_callbacks);
     my @given_keys = keys %return;
 
     for my $opt (keys %return) {
