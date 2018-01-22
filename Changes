@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.101     2018-01-21 19:32:11-05:00 America/New_York
         - escape some unescaped braces in regex
 
 0.100     2016-07-11 22:21:26-04:00 America/New_York
