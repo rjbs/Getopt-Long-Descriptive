@@ -1,6 +1,7 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - escape some unescaped braces in regex
 
 0.100     2016-07-11 22:21:26-04:00 America/New_York
         - show off "shortcircuit" in synopsis (thanks, Zhenyi Zhou)

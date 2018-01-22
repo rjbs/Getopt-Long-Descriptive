@@ -304,7 +304,7 @@ my %HIDDEN = (
   hidden => 1,
 );
 
-my $SPEC_RE = qr{(?:[:=][\d\w\+]+[%@]?({\d*,\d*})?|[!+])$};
+my $SPEC_RE = qr{(?:[:=][0-9\w\+]+[%@]?(\{[0-9]*,[0-9]*\})?|[!+])$};
 sub _strip_assignment {
   my ($self, $str) = @_;
 
