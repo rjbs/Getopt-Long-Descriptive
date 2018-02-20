@@ -37,7 +37,7 @@ Valid arguments are:
 sub new {
   my ($class, $arg) = @_;
 
-  my @to_copy = qw(options leader_text show_defaults);
+  my @to_copy = qw(leader_text options show_defaults);
 
   my %copy;
   @copy{ @to_copy } = @$arg{ @to_copy };
