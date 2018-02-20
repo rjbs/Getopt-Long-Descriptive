@@ -290,14 +290,20 @@ sub _nohidden {
 }
 
 sub _expand {
-  return map { {(
-    spec       => $_->[0] || '',
-    desc       => @$_ > 1 ? $_->[1] : 'spacer',
-    constraint => $_->[2] || {},
+  my @expanded;
 
-    # if @$_ is 0 then we got [], a spacer
-    name       => @$_ ? _munge((split /[:=|!+]/, $_->[0] || '')[0]) : '',
-  )} } @_;
+  for my $opt (@_) {
+    push @expanded, {
+      spec       => $opt->[0] || '',
+      desc       => @$opt > 1 ? $opt->[1] : 'spacer',
+      constraint => $opt->[2] || {},
+
+      # if @$_ is 0 then we got [], a spacer
+      name       => @$opt ? _munge((split /[:=|!+]/, $opt->[0] || '')[0]) : '',
+    };
+  }
+
+  return @expanded;
 }
 
 my %HIDDEN = (
