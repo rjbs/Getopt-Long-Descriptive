@@ -86,7 +86,9 @@ sub option_text {
     my $desc = $opt->{desc};
     my $assign;
     if ($desc eq 'spacer') {
-      $string .= sprintf "$spec_fmt\n", $opt->{spec};
+      my @lines = $self->_split_description($length, $opt->{spec});
+
+      $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
       next;
     }
 

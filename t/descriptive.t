@@ -315,22 +315,37 @@ is_opt(
 {
   local @ARGV;
   my ($opt, $usage) = describe_options(
-    "%c %o",
+    "test %o",
     [ foo => "a foo option" ],
     [ bar => "a bar option" ],
     [ baz => "a baz option with a very long description."
              . " It just goes on for a really long time."
              . " This allows us to test line wrapping and"
              . " make sure the output always looks spiffy" ],
+    [], # blank line
+    [ "We can do the same thing with a long spacer.  This option line is a"
+    . " spacer and it will be longer than the 78 column line that we use by"
+    . " default." ],
+    [], # blank line
+    [ xyz => "an xyz option" ],
   );
 
-  my $expect = qr/
-	--baz  a baz option with a very long description. It just goes on for
-	       a really long time. This allows us to test line wrapping and
-	       make sure the output always looks spiffy/;
+  my $expect = <<"EOO";
+test [long options...]
+\t--foo  a foo option
+\t--bar  a bar option
+\t--baz  a baz option with a very long description. It just goes on for
+\t       a really long time. This allows us to test line wrapping and
+\t       make sure the output always looks spiffy
 
+\tWe can do the same thing with a long spacer.  This option line
+\tis a spacer and it will be longer than the 78 column line that
+\twe use by default.
 
-  like($usage->text, $expect, 'long option description is wrapped cleanly');
+\t--xyz  an xyz option
+EOO
+
+  is($usage->text, $expect, 'long option description is wrapped cleanly');
 }
 
 {
