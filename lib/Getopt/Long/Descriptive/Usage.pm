@@ -186,7 +186,7 @@ sub _split_description {
 
 sub _parse_assignment {
     my ($assign_spec) = @_;
-    my $argument;
+
     my $result = 'STR';
     my $desttype;
     if (length($assign_spec) < 2) {
@@ -194,12 +194,15 @@ sub _parse_assignment {
         return '';
     }
 
-    $argument = substr $assign_spec, 1, 2;
-    if ($argument =~ m/^i/ or $argument =~ m/^o/) {
+    my $optional = substr($assign_spec, 0, 1) eq ':';
+    my $argument = substr $assign_spec, 1, 2;
+
+    if ($argument =~ m/^[io]/ or $assign_spec =~ m/^:[+0-9]/) {
         $result = 'INT';
     } elsif ($argument =~ m/^f/) {
         $result = 'NUM';
     }
+
     if (length($assign_spec) > 2) {
         $desttype = substr($assign_spec, 2, 1);
         if ($desttype eq '@') {
@@ -209,9 +212,11 @@ sub _parse_assignment {
             $result = "KEY=${result}...";
         }
     }
-    if (substr($assign_spec, 0, 1) eq ':') {
+
+    if ($optional) {
         return "[=$result]";
     }
+
     # with leading space so it can just blindly be appended.
     return " $result";
 }

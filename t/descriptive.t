@@ -218,6 +218,7 @@ is_opt(
     [ 'optional|o!'  => "optional" ],
     [ 'increment|i+' => "incremental option" ],
   );
+
   like(
     $usage->text,
     qr/\[-bhiloSs\]/,
@@ -364,13 +365,20 @@ EOO
   is($@, '', "no error in eval");
 }
 
-{
+subtest "descriptions for option value types" => sub {
   my $p = \&Getopt::Long::Descriptive::Usage::_parse_assignment;
 
   is ($p->('=s'), ' STR', 'string');
   is ($p->('=i'), ' INT', 'int (i)');
   is ($p->('=o'), ' INT', 'int (o)');
   is ($p->('=f'), ' NUM', 'float');
+
+  is ($p->(':s'), '[=STR]', 'optional string');
+  is ($p->(':i'), '[=INT]', 'optional int (i)');
+  is ($p->(':+'), '[=INT]', 'optional int (+)');
+  is ($p->(':2'), '[=INT]', 'optional int (2)');
+  is ($p->(':o'), '[=INT]', 'optional int (o)');
+  is ($p->(':f'), '[=NUM]', 'optional float');
 
   is ($p->('=s@'), ' STR...', 'strings');
   is ($p->('=i@'), ' INT...', 'ints (i)');
@@ -381,6 +389,6 @@ EOO
   is ($p->('=i%'), ' KEY=INT...', 'int maps (i)');
   is ($p->('=o%'), ' KEY=INT...', 'int maps (o)');
   is ($p->('=f%'), ' KEY=NUM...', 'float maps');
-}
+};
 
 done_testing;
