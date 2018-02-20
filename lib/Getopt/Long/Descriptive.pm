@@ -350,9 +350,11 @@ sub _build_describe_options {
         $opt->{constraint}->{one_of} = delete $opt->{desc};
         $opt->{desc} = 'hidden';
       }
+
       if ($HIDDEN{$opt->{desc}}) {
         $opt->{constraint}->{hidden}++;
       }
+
       if ($opt->{constraint}->{one_of}) {
         for my $one_opt (_expand(
           @{delete $opt->{constraint}->{one_of}}
@@ -370,13 +372,14 @@ sub _build_describe_options {
           push @opts, $one_opt;
         }
       }
+
       if ($opt->{constraint}{shortcircuit}
         && exists $opt->{constraint}{default}
       ) {
         carp('option "' . $opt->{name} . q[": 'default' does not make sense for shortcircuit options]);
       }
-      push @opts, $opt;
 
+      push @opts, $opt;
     }
 
     my @go_conf = @{ $arg->{getopt_conf} || $arg->{getopt} || [] };
