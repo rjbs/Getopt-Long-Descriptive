@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.102     2018-02-20 14:44:17-05:00 America/New_York
         - long spacer lines are now line broken
         - "empty" spacer lines no longer have leading whitespace
         - option specifications ":+" and ":5" (etc.) now get better
