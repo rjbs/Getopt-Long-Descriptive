@@ -2,6 +2,9 @@ Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
 
+0.103     2018-08-02 11:11:30-04:00 America/New_York
+        - show --[no-]option for boolean toggle options
+
 0.102     2018-02-20 14:44:17-05:00 America/New_York
         - long spacer lines are now line broken
         - "empty" spacer lines no longer have leading whitespace
