@@ -235,7 +235,7 @@ This throws the usage message as an exception.
 
   $usage_obj->die(\%arg);
 
-Some arguments can be provided 
+Some arguments can be provided
 
   pre_text  - text to be prepended to the usage message
   post_text - text to be appended to the usage message
