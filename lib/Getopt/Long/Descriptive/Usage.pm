@@ -93,9 +93,11 @@ sub option_text {
     }
 
     ($spec, $assign) = Getopt::Long::Descriptive->_strip_assignment($spec);
-    $assign = _parse_assignment($assign);
-    $spec = join " ", reverse map { length > 1 ? "--${_}$assign" : "-${_}$assign" }
-                              split /\|/, $spec;
+    my ($left, $right) = _parse_assignment($assign);
+    $spec = join q{ },
+              reverse
+              map { length > 1 ? "--$left$_$right" : "-${_}$right" }
+              split /\|/, $spec;
 
     my @desc = $self->_split_description($length, $desc);
 
@@ -126,7 +128,9 @@ sub _option_length {
     my $number_shortopts = 0;
     my ($spec, $argspec) = Getopt::Long::Descriptive->_strip_assignment($fullspec);
     my $length = length $spec;
-    my $arglen = length(_parse_assignment($argspec));
+
+    my ($left, $right) = _parse_assignment($argspec);
+    my $arglen = length($left) + length($right);
 
     # Spacing rules:
     #
@@ -191,7 +195,8 @@ sub _parse_assignment {
     my $desttype;
     if (length($assign_spec) < 2) {
         # empty, ! or +
-        return '';
+        return ('[no-]', '') if $assign_spec eq '!';
+        return ('', '');
     }
 
     my $optional = substr($assign_spec, 0, 1) eq ':';
@@ -214,11 +219,11 @@ sub _parse_assignment {
     }
 
     if ($optional) {
-        return "[=$result]";
+        return ("", "[=$result]");
     }
 
     # with leading space so it can just blindly be appended.
-    return " $result";
+    return ("", " $result");
 }
 
 =head2 warn

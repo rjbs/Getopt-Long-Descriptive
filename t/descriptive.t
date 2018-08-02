@@ -234,29 +234,39 @@ is_opt(
     [ 'ostring|S:s'  => "optional string value" ],
     [ 'list|l=s@'    => "list of strings" ],
     [ 'hash|h=s%'    => "hash values" ],
-    [ 'optional|o!'  => "optional" ],
+    [ 'optional|o!'  => "optional boolean" ],
     [ 'increment|i+' => "incremental option" ],
   );
   my $usage_text = $usage->text;
+
   like(
     $usage_text,
     qr/-s STR --string STR\s+string value/,
     "Spec =s gets an STR in usage output",
   );
+
   like(
     $usage_text,
     qr/-S\[=STR\] --ostring\[=STR\]\s+optional string value/,
     "Spec :s gets an STR in usage output",
   );
+
   like(
     $usage_text,
     qr/-l STR\Q...\E --list STR\Q...\E\s+list of strings/,
     "Spec =s@ gets an STR... in usage output",
   );
+
   like(
     $usage_text,
     qr/-h KEY=STR\Q...\E --hash KEY=STR\Q...\E\s+hash values/,
     "Spec =s% gets an KEY=STR... in usage output",
+  );
+
+  like(
+    $usage_text,
+    qr/-o --\[no-\]optional\s+optional boolean/,
+    "Spec ! gets a [no-] in usage output",
   );
 }
 
