@@ -86,10 +86,15 @@ sub option_text {
     my $desc = $opt->{desc};
     my $assign;
     if ($desc eq 'spacer') {
-      my @lines = $self->_split_description($length, $opt->{spec});
+      if (ref $opt->{spec}) {
+        $string .= "${ $opt->{spec} }\n";
+        next;
+      } else {
+        my @lines = $self->_split_description($length, $opt->{spec});
 
-      $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
-      next;
+        $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
+        next;
+      }
     }
 
     ($spec, $assign) = Getopt::Long::Descriptive->_strip_assignment($spec);

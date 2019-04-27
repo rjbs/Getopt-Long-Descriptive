@@ -209,6 +209,30 @@ is_opt(
   local @ARGV;
   my ($opt, $usage) = describe_options(
     "%c %o",
+    [ foo => "a foo option" ],
+    [],
+    [\"bar options:\n -> they are cool"],
+    [ bar => "a bar option" ],
+  );
+
+  like(
+    $usage->text,
+    qr/foo option\n[\t\x20]*\nbar options:\n -> they are cool\n\s+--bar/,
+    "verbatim spacer found",
+  );
+
+  local $SIG{__WARN__} = sub {}; # we know that this will warn; don't care
+  like(
+    $usage->(1),
+    qr/foo option\n[\t\x20]*\nbar options:\n -> they are cool\n\s+--bar/,
+    "CODEISH: spacer and non-option description found",
+  );
+}
+
+{
+  local @ARGV;
+  my ($opt, $usage) = describe_options(
+    "%c %o",
     [ 'foo'          => "foo option" ],
     [ 'bar|b'        => "bar option" ],
     [ 'string|s=s'   => "string value" ],

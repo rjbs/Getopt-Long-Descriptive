@@ -1,6 +1,7 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - allow for verbatim text in descripition options
 
 0.103     2018-08-02 11:11:30-04:00 America/New_York
         - show --[no-]option for boolean toggle options
