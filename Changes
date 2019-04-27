@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.104     2019-04-27 10:50:50+01:00 Europe/London
         - allow for verbatim text in descripition options
 
 0.103     2018-08-02 11:11:30-04:00 America/New_York
