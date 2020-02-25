@@ -378,6 +378,10 @@ sub _build_describe_options {
           }
           $one_opt->{constraint}->{one_of} = $opt->{name};
           push @opts, $one_opt;
+
+          # Ensure that we generate accessors for all one_of sub-options
+          $method_map{ $one_opt->{name} } = undef
+            unless $one_opt->{desc} eq 'spacer';
         }
       }
 

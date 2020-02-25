@@ -334,6 +334,22 @@ is_opt(
 }
 
 {
+  local @ARGV = qw(--get);
+  my ($opt, $usage) = describe_options(
+    "%c %o",
+    [ "mode" => hidden => { one_of => [
+      [ "get" => "get the value"  ],
+      [ "set" => "set the value" ],
+    ] } ],
+  );
+  is( $opt->{get}, 1, "one_of provided value (as hash key)" );
+  is( $opt->get,   1, "one_of provided value (as method)" );
+
+  is( $opt->{set}, undef, "one_of entry not given is undef (as hash key)" );
+  is( $opt->set,   undef, "one_of entry not given is undef (as method)");
+}
+
+{
   local @ARGV = qw(--foo-bar);
   my ($opt) = describe_options(
     "%c %o",
