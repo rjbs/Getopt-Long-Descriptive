@@ -384,6 +384,26 @@ EOO
 }
 
 {
+  my @gld_args = ('%c %o', [ 'exit!', 'hell is other getopts' ]);
+
+  my @test = (
+    # (expected $opt->exit) then (@ARGV)
+    [ undef,              ],
+    [ 1,      '--exit'    ],
+    [ 0,      '--no-exit' ],
+  );
+
+  for my $test (@test) {
+    my $want = shift @$test;
+    local @ARGV = @$test;
+
+    my ($opt, $usage) = describe_options(@gld_args);
+
+    is(scalar $opt->exit, $want, "(@$test) for exit!");
+  }
+}
+
+{
   local @ARGV;
   my ($opt, $usage) = describe_options(
     "%c %o",
