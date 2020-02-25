@@ -2,6 +2,9 @@ Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
 
+0.105     2020-02-26 09:40:36+11:00 Australia/Melbourne
+        - one_of suboptions now get accessors (thanks, Michael McClimon!)
+
 0.104     2019-04-27 10:50:50+01:00 Europe/London
         - allow for verbatim text in descripition options
 
