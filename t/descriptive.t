@@ -437,6 +437,21 @@ EOO
   is($@, '', "no error in eval");
 }
 
+{
+  local @ARGV;
+  local $@;
+
+  eval {
+    my ($opt, $usage) = describe_options(
+      "%c %o",
+      [ 'force|f' => "you gotta have" ],
+      [ 'faith|f' => "freedom 90" ],
+    );
+  };
+
+  like($@, qr/these ambiguous options: f/, "GLD catches ambiguity for you");
+}
+
 subtest "descriptions for option value types" => sub {
   my $p = \&Getopt::Long::Descriptive::Usage::_parse_assignment;
 
