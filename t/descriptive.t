@@ -2,9 +2,8 @@
 use strict;
 use warnings;
 
+use Getopt::Long::Descriptive ;
 use Test::More;
-
-use_ok("Getopt::Long::Descriptive");
 
 # test constraints:
 # (look at P::V for names, too)
