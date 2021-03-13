@@ -3,6 +3,8 @@ use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
+use v5.8;
+
 use Carp qw(carp croak);
 use File::Basename ();
 use Getopt::Long 2.33;
