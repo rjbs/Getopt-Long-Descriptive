@@ -437,7 +437,7 @@ sub _build_describe_options {
     $opt_count{$_}++ for @options;
     my @redundant = sort grep {; $opt_count{$_} > 1 } keys %opt_count;
 
-    die "Getopt::Long::Descriptive was configured with these ambiguous options: @redundant\n"
+    warn "Getopt::Long::Descriptive was configured with these ambiguous options: @redundant\n"
       if @redundant;
 
     my $short = join q{},

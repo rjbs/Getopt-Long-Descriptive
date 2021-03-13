@@ -441,15 +441,23 @@ EOO
   local @ARGV;
   local $@;
 
-  eval {
+  my @warnings;
+  {
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
     my ($opt, $usage) = describe_options(
       "%c %o",
       [ 'force|f' => "you gotta have" ],
       [ 'faith|f' => "freedom 90" ],
     );
-  };
+  }
 
-  like($@, qr/these ambiguous options: f/, "GLD catches ambiguity for you");
+  is(@warnings, 1, "got a warning");
+  like(
+    $warnings[0],
+    qr/these ambiguous options: f/,
+    "GLD warns on ambiguity for you",
+  );
 }
 
 subtest "descriptions for option value types" => sub {
