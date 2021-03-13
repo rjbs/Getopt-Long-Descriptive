@@ -428,12 +428,22 @@ sub _build_describe_options {
       grep { $_->{desc} ne 'spacer' }
       _nohidden(@opts);
 
-    my $short = join q{},
-      sort  { lc $a cmp lc $b or $a cmp $b }
-      grep  { /^.$/ }
+    my @options =
       map   { split /\|/ }
       map   { scalar __PACKAGE__->_strip_assignment($_) }
       @specs;
+
+    my %opt_count;
+    $opt_count{$_}++ for @options;
+    my @redundant = sort grep {; $opt_count{$_} > 1 } keys %opt_count;
+
+    warn "Getopt::Long::Descriptive was configured with these ambiguous options: @redundant\n"
+      if @redundant;
+
+    my $short = join q{},
+      sort  { lc $a cmp lc $b or $a cmp $b }
+      grep  { /^.$/ }
+      @options;
 
     my $long = grep /\b[^|]{2,}/, @specs;
 

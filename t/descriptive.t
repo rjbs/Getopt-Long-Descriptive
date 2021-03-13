@@ -2,9 +2,8 @@
 use strict;
 use warnings;
 
+use Getopt::Long::Descriptive ;
 use Test::More;
-
-use_ok("Getopt::Long::Descriptive");
 
 # test constraints:
 # (look at P::V for names, too)
@@ -435,6 +434,29 @@ EOO
     alarm(0);
   };
   is($@, '', "no error in eval");
+}
+
+{
+  local @ARGV;
+  local $@;
+
+  my @warnings;
+  {
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+    my ($opt, $usage) = describe_options(
+      "%c %o",
+      [ 'force|f' => "you gotta have" ],
+      [ 'faith|f' => "freedom 90" ],
+    );
+  }
+
+  is(@warnings, 1, "got a warning");
+  like(
+    $warnings[0],
+    qr/these ambiguous options: f/,
+    "GLD warns on ambiguity for you",
+  );
 }
 
 subtest "descriptions for option value types" => sub {
