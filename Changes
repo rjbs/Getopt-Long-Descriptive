@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.106     2021-03-12 21:29:54-05:00 America/New_York
         - improved formatting of switches
         - when available, use Term::ReadKey to get terminal width
         - when an option name is defined twice, warn about it
