@@ -74,9 +74,10 @@ This returns the text describing the available options.
 sub option_text {
   my ($self) = @_;
 
-  my @options  = @{ $self->{options} || [] };
   my $string   = q{};
-  my @specs = map { $_->{spec} } grep { $_->{desc} ne 'spacer' } @options;
+
+  my @options  = @{ $self->{options} || [] };
+  my @specs    = map { $_->{spec} } grep { $_->{desc} ne 'spacer' } @options;
   my $length   = (max(map { _option_length($_) } @specs) || 0);
   my $spec_fmt = "\t%-${length}s";
 
@@ -84,7 +85,7 @@ sub option_text {
     my $opt  = shift @options;
     my $spec = $opt->{spec};
     my $desc = $opt->{desc};
-    my $assign;
+
     if ($desc eq 'spacer') {
       if (ref $opt->{spec}) {
         $string .= "${ $opt->{spec} }\n";
@@ -97,14 +98,27 @@ sub option_text {
       }
     }
 
-    ($spec, $assign) = Getopt::Long::Descriptive->_strip_assignment($spec);
-    my ($left, $right) = _parse_assignment($assign);
-    $spec = join q{ },
-              reverse
-              map { length > 1 ? "--$left$_$right" : "-${_}$right" }
-              split /\|/, $spec;
+    ($spec, my $assign) = Getopt::Long::Descriptive->_strip_assignment($spec);
+
+    my ($pre, $post) = _parse_assignment($assign);
+    my @names = split /\|/, $spec;
+
+    my $primary = shift @names;
+    my $short;
+    my ($i) = grep {; length $names[$_] == 1 } keys @names;
+    if (defined $i) {
+      $short = splice @names, $i, 1;
+    }
+
+    $spec = length $primary > 1 ? "--$pre$primary$post" : "-$primary$post";
+    $spec .= " (or -$short)" if $short;
 
     my @desc = $self->_split_description($length, $desc);
+
+    if (@names) {
+      push @desc,
+        "aka " . join q{, }, map { length > 1 ? "--$_" : "-$_" } @names;
+    }
 
     # add default value if it exists
     if (exists $opt->{constraint}->{default} and $self->{show_defaults}) {
@@ -128,56 +142,32 @@ sub option_text {
 
 sub _option_length {
     my ($fullspec) = @_;
-    my $number_opts = 1;
-    my $last_pos = 0;
-    my $number_shortopts = 0;
+
     my ($spec, $argspec) = Getopt::Long::Descriptive->_strip_assignment($fullspec);
-    my $length = length $spec;
 
-    my ($left, $right) = _parse_assignment($argspec);
-    my $arglen = length($left) + length($right);
+    my ($pre, $post) = _parse_assignment($argspec);
+    my @names = split /\|/, $spec;
 
-    # Spacing rules:
-    #
-    # For short options we want 1 space (for '-'), for long options 2
-    # spaces (for '--').  Then one space for separating the options,
-    # but we here abuse that $spec has a '|' char for that.
-    #
-    # For options that take arguments, we want 2 spaces for mandatory
-    # options ('=X') and 4 for optional arguments ('[=X]').  Note we
-    # consider {N,M} cases as "single argument" atm.
+    my $primary = shift @names;
+    my $short   = (@names && length $names[0] eq 1)
+                ? shift @names
+                : undef;
 
-    # Count the number of "variants" (e.g. "long|s" has two variants)
-    while ($spec =~ m{\|}g) {
-        $number_opts++;
-        if (pos($spec) - $last_pos == 2) {
-            $number_shortopts++;
-        }
-        $last_pos = pos($spec);
-    }
+    $spec = length $primary > 1 ? "--$pre$primary$post" : "-$primary$post";
+    $spec .= " (or -$short)" if $short;
 
-    # Was the last option a "short" one?
-    if ($length - $last_pos == 1) {
-        $number_shortopts++;
-    }
+    return length $spec;
+}
 
-    # We got $number_opts options, each with an argument length of
-    # $arglen.  Plus each option (after the first) needs 3 a char
-    # spacing.  $length gives us the total length of all options and 1
-    # char spacing per option (after the first).  So the result should be:
-
-    my $number_longopts = $number_opts - $number_shortopts;
-    my $total_arglen = $number_opts * $arglen;
-    my $total_optsep = 2 * $number_longopts + $number_shortopts;
-    my $total = $length + $total_optsep + $total_arglen;
-    return $total;
+sub _max_line_length {
+  return $Getopt::Long::Descriptive::TERM_WIDTH - 2;
 }
 
 sub _split_description {
   my ($self, $length, $desc) = @_;
 
-  # 8 for a tab, 2 for the space between option & desc;
-  my $max_length = 78 - ( $length + 8 + 2 );
+  # 8 for a tab, 2 for the space between option & desc, 2 more for gutter
+  my $max_length = $self->_max_line_length - ( $length + 8 + 2 );
 
   return $desc if length $desc <= $max_length;
 

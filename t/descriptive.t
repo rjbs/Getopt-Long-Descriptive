@@ -265,31 +265,31 @@ is_opt(
 
   like(
     $usage_text,
-    qr/-s STR --string STR\s+string value/,
+    qr/--string STR \(or -s\)\s+string value/,
     "Spec =s gets an STR in usage output",
   );
 
   like(
     $usage_text,
-    qr/-S\[=STR\] --ostring\[=STR\]\s+optional string value/,
+    qr/--ostring\[=STR\] \(or -S\)\s+optional string value/,
     "Spec :s gets an STR in usage output",
   );
 
   like(
     $usage_text,
-    qr/-l STR\Q...\E --list STR\Q...\E\s+list of strings/,
+    qr/--list STR\Q...\E \(or -l\)\s+list of strings/,
     "Spec =s@ gets an STR... in usage output",
   );
 
   like(
     $usage_text,
-    qr/-h KEY=STR\Q...\E --hash KEY=STR\Q...\E\s+hash values/,
+    qr/--hash KEY=STR\Q...\E \(or -h\)\s+hash values/,
     "Spec =s% gets an KEY=STR... in usage output",
   );
 
   like(
     $usage_text,
-    qr/-o --\[no-\]optional\s+optional boolean/,
+    qr/--\[no-\]optional \(or -o\)\s+optional boolean/,
     "Spec ! gets a [no-] in usage output",
   );
 }
@@ -365,6 +365,8 @@ is_opt(
 
 {
   local @ARGV;
+  local $Getopt::Long::Descriptive::TERM_WIDTH = 80;
+
   my ($opt, $usage) = describe_options(
     "test %o",
     [ foo => "a foo option" ],

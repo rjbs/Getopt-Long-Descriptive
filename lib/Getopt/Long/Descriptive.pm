@@ -287,6 +287,16 @@ my %CONSTRAINT = (
 
 our $MungeOptions = 1;
 
+our $TERM_WIDTH;
+{
+  if (eval { require Term::ReadKey; 1 }) {
+    my ($width) = Term::ReadKey::GetTerminalSize();
+    $TERM_WIDTH = $width;
+  } else {
+    $TERM_WIDTH = $ENV{COLUMNS} || 80;
+  }
+}
+
 sub _nohidden {
   return grep { ! $_->{constraint}->{hidden} } @_;
 }
