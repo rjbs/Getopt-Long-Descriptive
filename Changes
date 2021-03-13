@@ -1,6 +1,10 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - improved formatting of switches
+        - when available, use Term::ReadKey to get terminal width
+        - when an option name is defined twice, warn about it
+          THIS WILL BECOME FATAL IN A FUTURE VERSION
 
 0.105     2020-02-26 09:40:36+11:00 Australia/Melbourne
         - one_of suboptions now get accessors (thanks, Michael McClimon!)
