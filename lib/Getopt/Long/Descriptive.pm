@@ -3,7 +3,7 @@ use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
-use v5.8;
+use v5.10;
 
 use Carp qw(carp croak);
 use File::Basename ();
@@ -331,12 +331,10 @@ sub _strip_assignment {
   (my $copy = $str) =~ s{$SPEC_RE}{};
 
   if (wantarray) {
-      my $len = length $copy;
-      my $assignment = substr $str, $len;
-      if (!defined($assignment)) {
-          $assignment = '';
-      }
-      return ($copy, $assignment);
+    my $len = length $copy;
+    my $assignment = substr($str, $len) // q{};
+
+    return ($copy, $assignment);
   }
   return $copy;
 }
@@ -459,9 +457,8 @@ sub _build_describe_options {
     );
 
     (my $str = $format) =~ s<%(.)><
-      defined $replace{$1}
-      ? $replace{$1}
-      : Carp::croak("unknown sequence %$1 in first argument to describe_options")
+      $replace{$1}
+      // Carp::croak("unknown sequence %$1 in first argument to describe_options")
     >ge;
 
     $str =~ s/[\x20\t]{2,}/ /g;
@@ -502,7 +499,7 @@ sub _build_describe_options {
         given_keys => \@given_keys,
         parent_of  => \%parent_of,
       );
-      next unless (defined($new) || exists($return{$name}));
+      next unless defined $new || exists $return{$name};
       $return{$name} = $new;
 
       if ($is_shortcircuit) {
