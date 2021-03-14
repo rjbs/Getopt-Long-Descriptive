@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - Term::ReadKey has been dropped; caused too many problems
+        - minimum version is now v5.10.1, not v5.10.0
 
 0.106     2021-03-12 21:29:54-05:00 America/New_York
         - improved formatting of switches
