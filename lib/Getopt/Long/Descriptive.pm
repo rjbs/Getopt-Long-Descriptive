@@ -291,12 +291,22 @@ our $MungeOptions = 1;
 
 our $TERM_WIDTH;
 {
-  if (eval { require Term::ReadKey; 1 }) {
-    my ($width) = Term::ReadKey::GetTerminalSize();
-    $TERM_WIDTH = $width;
-  } else {
-    $TERM_WIDTH = $ENV{COLUMNS} || 80;
-  }
+  $TERM_WIDTH = $ENV{COLUMNS} || 80;
+
+  # So, this was the old code:
+  #
+  #   if (eval { require Term::ReadKey; 1 }) {
+  #     my ($width) = Term::ReadKey::GetTerminalSize();
+  #     $TERM_WIDTH = $width;
+  #   } else {
+  #     $TERM_WIDTH = $ENV{COLUMNS} || 80;
+  #   }
+  #
+  # ...but the problem is that Term::ReadKey will carp when it can't get an
+  # answer, it can't be trivially made to keep quiet.  (I decline to stick a
+  # local $SIG{__WARN__} here, as it's too heavy a hammer.)  With the new (as
+  # of 2021-03) formatting code, using the full width is less of an issue,
+  # anyway.
 }
 
 sub _nohidden {
