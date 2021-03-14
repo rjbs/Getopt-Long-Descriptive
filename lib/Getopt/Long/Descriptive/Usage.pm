@@ -105,7 +105,7 @@ sub option_text {
 
     my $primary = shift @names;
     my $short;
-    my ($i) = grep {; length $names[$_] == 1 } keys @names;
+    my ($i) = grep {; length $names[$_] == 1 } (0 .. $#names);
     if (defined $i) {
       $short = splice @names, $i, 1;
     }
