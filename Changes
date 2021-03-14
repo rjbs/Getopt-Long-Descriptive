@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.107     2021-03-14 16:15:57-04:00 America/New_York
         - Term::ReadKey has been dropped; caused too many problems
         - minimum version is now v5.10.1, not v5.10.0
 
