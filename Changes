@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.108     2021-03-16 09:54:51-04:00 America/New_York
         - provide diagnostics in tests when more warnings arrive than are
           expected
 
