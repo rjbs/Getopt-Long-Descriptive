@@ -451,12 +451,20 @@ EOO
     );
   }
 
-  is(@warnings, 1, "got a warning");
-  like(
-    $warnings[0],
-    qr/these ambiguous options: f/,
-    "GLD warns on ambiguity for you",
-  );
+  if (@warnings == 1) {
+    pass("got one warning about ambiguity of options");
+    like(
+      $warnings[0],
+      qr/these ambiguous options: f/,
+      "GLD warns on ambiguity for you",
+    );
+  } elsif (! @warnings) {
+    fail("got one warning about ambiguity of options");
+    diag("expected a warning but got none");
+  } else {
+    fail("got one warning about ambiguity of options");
+    diag("warning: $_") for @warnings;
+  }
 }
 
 subtest "descriptions for option value types" => sub {
