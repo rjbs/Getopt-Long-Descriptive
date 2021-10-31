@@ -2,6 +2,9 @@ Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
 
+0.110     2021-10-30 23:11:43-04:00 America/New_York
+        - just small packaging updates
+
 0.109     2021-03-16 19:55:45-04:00 America/New_York
         - eliminate warnings-count failure by requiring an ExtUtils::MakeMaker
           from late 2013 or later;  without this, very old EUMM could pass -w
