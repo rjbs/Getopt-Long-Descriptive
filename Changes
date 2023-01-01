@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.111     2022-12-31 21:15:52-05:00 America/New_York
         - clean up the required perl version in the code
         - update author contact info
 
