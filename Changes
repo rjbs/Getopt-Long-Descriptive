@@ -1,6 +1,9 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - This version removes the redundant option warning, which is now
+          provided by Getopt::Long v2.55 and later -- which is now required!
+          As before, this will someday become fatal.
 
 0.111     2022-12-31 21:15:52-05:00 America/New_York
         - clean up the required perl version in the code

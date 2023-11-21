@@ -7,7 +7,7 @@ use v5.12;
 
 use Carp qw(carp croak);
 use File::Basename ();
-use Getopt::Long 2.33;
+use Getopt::Long 2.55;
 use List::Util qw(first);
 use Params::Validate 0.97 qw(:all);
 use Scalar::Util ();
@@ -445,10 +445,6 @@ sub _build_describe_options {
 
     my %opt_count;
     $opt_count{$_}++ for @options;
-    my @redundant = sort grep {; $opt_count{$_} > 1 } keys %opt_count;
-
-    warn "Getopt::Long::Descriptive was configured with these ambiguous options: @redundant\n"
-      if @redundant;
 
     my $short = join q{},
       sort  { lc $a cmp lc $b or $a cmp $b }
