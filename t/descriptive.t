@@ -192,14 +192,14 @@ is_opt(
 
   like(
     $usage->text,
-    qr/foo option\n[\t\x20]*\n\tbar options:\n\s+--bar/,
+    qr/foo option\n[\t\x20]*\n    bar options:\n\s+--bar/,
     "spacer and non-option description found",
   );
 
   local $SIG{__WARN__} = sub {}; # we know that this will warn; don't care
   like(
     $usage->(1),
-    qr/foo option\n[\t\x20]*\n\tbar options:\n\s+--bar/,
+    qr/foo option\n[\t\x20]*\n    bar options:\n\s+--bar/,
     "CODEISH: spacer and non-option description found",
   );
 }
@@ -384,17 +384,17 @@ is_opt(
 
   my $expect = <<"EOO";
 test [long options...]
-\t--foo  a foo option
-\t--bar  a bar option
-\t--baz  a baz option with a very long description. It just goes on for
-\t       a really long time. This allows us to test line wrapping and
-\t       make sure the output always looks spiffy
+    --foo  a foo option
+    --bar  a bar option
+    --baz  a baz option with a very long description. It just goes on for
+           a really long time. This allows us to test line wrapping and
+           make sure the output always looks spiffy
 
-\tWe can do the same thing with a long spacer.  This option line
-\tis a spacer and it will be longer than the 78 column line that
-\twe use by default.
+    We can do the same thing with a long spacer.  This option line is a
+    spacer and it will be longer than the 78 column line that we use by
+    default.
 
-\t--xyz  an xyz option
+    --xyz  an xyz option
 EOO
 
   is($usage->text, $expect, 'long option description is wrapped cleanly');
