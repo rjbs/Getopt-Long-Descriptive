@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use v5.20.0;
+use warnings;
+
+use lib 'lib';
+use Getopt::Long::Descriptive;
+
+# This program here is to spit out usage so you can see what things look like.
+# It will change over time to keep demonstrating stuff.  Enjoy.
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ "simple",     "the simplest option" ],
+  [ "alias|aka",  "something with two names" ],
+  [ "short|s",    "something with a short name" ],
+  [ "longdesc",   "The description for this option is relatively long, okay?" ],
+  [], # a blank!
+  [ "A sentence of text that runs just about the whole width of my terminal." ],
+  [],
+  [ "bananas|b!", "an on/off option" ],
+);
+
+print $usage->text;
