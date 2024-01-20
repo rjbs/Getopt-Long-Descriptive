@@ -180,6 +180,17 @@ is_opt(
   "required option -- help text"
 );
 
+is_opt(
+  [ ],
+  [
+    [ unreq => 'an unrequired option' => {
+      required => 0
+    } ],
+  ],
+  {},
+  "an unrequired option"
+);
+
 {
   local @ARGV;
   my ($opt, $usage) = describe_options(
