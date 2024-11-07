@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - cope with the user forgetting the first argument, generally "%c %o",
+          to `describe_options`, by assuming they meant that value exactly
 
 0.114     2024-01-20 17:14:21-05:00 America/New_York
         - a switch with (required => 0) is no longer treated as a required!
