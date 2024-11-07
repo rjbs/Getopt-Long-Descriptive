@@ -2,7 +2,10 @@
 use strict;
 use warnings;
 
-use Getopt::Long::Descriptive ;
+# Set this before loading GLD so its prog_name returns a known string.
+BEGIN { $0 = 'test-program' }
+
+use Getopt::Long::Descriptive;
 use Test::More;
 
 # test constraints:
@@ -406,6 +409,24 @@ test [long options...]
     default.
 
     --xyz  an xyz option
+EOO
+
+  is($usage->text, $expect, 'long option description is wrapped cleanly');
+}
+
+{
+  local @ARGV;
+  local $Getopt::Long::Descriptive::TERM_WIDTH = 80;
+
+  # We're testing, here, that if we "forget" the usual "%c %o" style format,
+  # its assumed.
+  my ($opt, $usage) = describe_options(
+    [ foo => "a foo option" ],
+  );
+
+  my $expect = <<"EOO";
+test-program [long options...]
+    --foo  a foo option
 EOO
 
   is($usage->text, $expect, 'long option description is wrapped cleanly');
