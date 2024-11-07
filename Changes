@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.115     2024-11-07 18:00:02+00:00 Europe/Dublin
         - cope with the user forgetting the first argument, generally "%c %o",
           to `describe_options`, by assuming they meant that value exactly
 
