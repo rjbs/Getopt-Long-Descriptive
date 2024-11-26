@@ -477,6 +477,24 @@ sub _build_describe_options {
     Getopt::Long::Configure(@go_conf);
 
     my %return;
+    
+    # give %return data types to give GetOptions datatype hints
+    for my $getopt_spec (@getopt_specs) {
+        my ($opt_name, $assignment) = __PACKAGE__->_strip_assignment($getopt_spec);
+        # leave only the first name as the "final" option name
+        $opt_name =~ s/\|.*$//;
+        $opt_name =~ s/([\|:=!+].*)//;
+
+        # set appropriate referance type for opt datatype
+        if ($assignment =~ /%/) {
+            $return{$opt_name} = {};
+        } elsif ($assignment =~ /\@|\{|\}/) {
+            $return{$opt_name} = [];
+        } else {
+            # do nothing
+        }
+    }
+    
     $usage->die unless GetOptions(\%return, grep { length } @getopt_specs);
     my @given_keys = keys %return;
 
