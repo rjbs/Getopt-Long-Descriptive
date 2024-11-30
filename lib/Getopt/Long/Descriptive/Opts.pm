@@ -100,7 +100,9 @@ sub ___class_for_opt {
     ${"$new_class\::VERSION"} = $class->VERSION;
     *{"$new_class\::ISA"} = [ 'Getopt::Long::Descriptive::Opts' ];
     for my $opt (keys %$values) {
-      *{"$new_class\::$opt"} = sub { $_[0]->{ $opt } };
+      *{"$new_class\::$opt"} = sub {
+	  return @_ > 1 ?  $_[0]->{ $opt } = $_[1] :  $_[0]->{ $opt};
+      };
     }
   }
 

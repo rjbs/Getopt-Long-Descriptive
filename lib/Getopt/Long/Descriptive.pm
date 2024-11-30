@@ -68,9 +68,10 @@ wrong and a usage message.
 
 The C<$opt> object will be a dynamically-generated subclass of
 L<Getopt::Long::Descriptive::Opts>.  In brief, each of the options in
-C<@opt_spec> becomes an accessor method on the object, using the first-given
-name, with dashes converted to underscores.  For more information, see the
-documentation for the Opts class.
+C<@opt_spec> becomes an accessor method on the object, using the
+first-given name, with dashes converted to underscores.  Accessors are
+also mutators: passing a value to the accessor will set the option's
+value. For more information, see the documentation for the Opts class.
 
 The C<$usage> object will be a L<Getopt::Long::Descriptive::Usage> object,
 which provides a C<text> method to get the text of the usage message and C<die>
