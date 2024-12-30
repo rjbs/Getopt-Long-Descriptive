@@ -494,4 +494,23 @@ subtest "descriptions for option value types" => sub {
   is ($p->('=f%'), ' KEY=NUM...', 'float maps');
 };
 
+{
+  # Asking Getopt::Long::Descriptive to use a specific Getopt::Long config
+  # should not alter the global state after the describe_options(...) call has
+  # returned!
+  ok(!$Getopt::Long::gnu_compat, "Getopt::Long::gnu_compat starts life false");
+
+  is_opt(
+    [ ],
+    [
+      [ "foo-bar=i", "foo integer", { default => 17 } ],
+      { getopt_conf => [ 'gnu_compat' ] },
+    ],
+    { foo_bar => 17 },
+    "default foo_bar with no short option name",
+  );
+
+  ok(!$Getopt::Long::gnu_compat, "Getopt::Long::gnu_compat still false after getopt");
+}
+
 done_testing;

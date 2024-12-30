@@ -474,11 +474,13 @@ sub _build_describe_options {
       show_defaults => $arg->{show_defaults},
     });
 
-    Getopt::Long::Configure(@go_conf);
+    my $old_go_conf = Getopt::Long::Configure(@go_conf);
 
     my %return;
     $usage->die unless GetOptions(\%return, grep { length } @getopt_specs);
     my @given_keys = keys %return;
+
+    Getopt::Long::Configure($old_go_conf);
 
     for my $opt (keys %return) {
       my $newopt = _munge($opt);

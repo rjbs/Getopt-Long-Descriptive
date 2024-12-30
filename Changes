@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+        - do not leave Getopt::Long configuration in an altered state after
+          getting options
 
 0.115     2024-11-07 18:00:02+00:00 Europe/Dublin
         - cope with the user forgetting the first argument, generally "%c %o",
