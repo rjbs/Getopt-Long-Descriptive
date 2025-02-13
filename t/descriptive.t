@@ -513,4 +513,23 @@ subtest "descriptions for option value types" => sub {
   ok(!$Getopt::Long::gnu_compat, "Getopt::Long::gnu_compat still false after getopt");
 }
 
+
+# mutator
+{
+  local @ARGV = qw(--foo FOO --baz BAZ);
+  my ($c_opt, $usage) = describe_options(
+    "%c %o",
+    [ "foo=s", '' ],
+    [ "bar=s", '', { default => 'BAR' } ],
+    [ "baz=s", '', { default => 'BAZ' } ],
+  );
+
+  is($c_opt->foo, 'FOO', 'c_opt->foo is FOO');
+  is($c_opt->foo( 'bar' ), 'bar', 'mutator: c_opt->foo("bar") is bar');
+  is($c_opt->bar, 'BAR', 'c_opt->bar is BAR');
+  is($c_opt->bar( 'foo' ), 'foo', 'mutator: c_opt->bar("foo") is foo');
+
+}
+
+
 done_testing;
