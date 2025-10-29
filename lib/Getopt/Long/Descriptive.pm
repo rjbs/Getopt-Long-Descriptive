@@ -565,6 +565,12 @@ sub _validate_with {
           $arg{opts},
         ),
       };
+    } elsif ($ct eq 'callbacks') {
+      $pvspec{callbacks} ||= {};
+      $pvspec{callbacks} = {
+        %{$pvspec{callbacks}},
+        %{$spec->{$ct}},
+      };
     } else {
       %pvspec = (
         %pvspec,
