@@ -1,6 +1,8 @@
 Revision history for Getopt-Long-Descriptive
 
 {{$NEXT}}
+
+0.117     2026-02-19 15:24:11-05:00 America/New_York
         - add (experimental!!) generation of bash/zsh completion scripts for
           GLD-powered programs; this code might go away or change or break in
           the future, don't rely on it… yet?
