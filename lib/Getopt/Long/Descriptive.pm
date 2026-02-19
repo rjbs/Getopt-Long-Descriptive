@@ -363,6 +363,22 @@ sub _build_describe_options {
   sub {
     my $format = (ref $_[0] ? '%c %o' : shift(@_));
     my $arg    = (ref $_[-1] and ref $_[-1] eq 'HASH') ? pop @_ : {};
+
+    # If GETOPT_LONG_DESCRIPTIVE_COMPLETION is set, emit a shell completion
+    # script to stdout and exit 42.  Supported values are 'bash' and 'zsh'.
+    # Any other value raises an exception. -- claude, 2026-02-19
+    if (my $shell = $ENV{GETOPT_LONG_DESCRIPTIVE_COMPLETION}) {
+      if ($shell eq 'bash') {
+        print _bash_completion_script(@_);
+        exit 42;
+      } elsif ($shell eq 'zsh') {
+        print _zsh_completion_script(@_);
+        exit 42;
+      } else {
+        Carp::croak("unknown shell '$shell' in GETOPT_LONG_DESCRIPTIVE_COMPLETION");
+      }
+    }
+
     my @opts;
 
     my %parent_of;
@@ -844,6 +860,56 @@ sub _completion_for_zsh {
   }
 
   return @args;
+}
+
+sub _bash_completion_script {
+  my $prog = prog_name();
+  (my $fn_name = "_${prog}_completion") =~ s/[^a-zA-Z0-9_]/_/g;
+
+  my $data = _completion_for_bash(@_);
+
+  my $script  = "$fn_name() {\n";
+  $script    .= "    local cur prev\n";
+  $script    .= "    COMPREPLY=()\n";
+  $script    .= '    cur="${COMP_WORDS[COMP_CWORD]}"' . "\n";
+  $script    .= '    prev="${COMP_WORDS[COMP_CWORD-1]}"' . "\n";
+
+  if (@{ $data->{prev_cases} }) {
+    $script  .= "    case \"\$prev\" in\n";
+    for my $case (@{ $data->{prev_cases} }) {
+      $script .= "        $case->{pattern})\n";
+      $script .= "            $case->{action}\n";
+      $script .= "            return\n";
+      $script .= "            ;;\n";
+    }
+    $script  .= "    esac\n";
+  }
+
+  my $flags = $data->{flags};
+  $script  .= "    COMPREPLY=(\$(compgen -W \"$flags\" -- \"\$cur\"))\n";
+  $script  .= "}\n";
+  $script  .= "complete -F $fn_name $prog\n";
+
+  return $script;
+}
+
+sub _zsh_completion_script {
+  my $prog = prog_name();
+  (my $fn_name = "_$prog") =~ s/[^a-zA-Z0-9_]/_/g;
+
+  my @args = _completion_for_zsh(@_);
+
+  my $script  = "#compdef $prog\n";
+  $script    .= "$fn_name() {\n";
+  $script    .= "    local -a arguments\n";
+  $script    .= "    arguments=(\n";
+  $script    .= "        $_\n" for @args;
+  $script    .= "    )\n";
+  $script    .= "    _arguments \$arguments\n";
+  $script    .= "}\n";
+  $script    .= "$fn_name\n";
+
+  return $script;
 }
 
 {
