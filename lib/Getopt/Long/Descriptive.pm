@@ -366,7 +366,10 @@ sub _build_describe_options {
 
     # If GETOPT_LONG_DESCRIPTIVE_COMPLETION is set, emit a shell completion
     # script to stdout and exit 42.  Supported values are 'bash' and 'zsh'.
-    # Any other value raises an exception. -- claude, 2026-02-19
+    # Any other value raises an exception.  If
+    # GETOPT_LONG_DESCRIPTIVE_COMPLETION_NAME is set, it is treated as a
+    # comma-separated list of command names to register completion for,
+    # overriding the script name. -- claude, 2026-02-19
     if (my $shell = $ENV{GETOPT_LONG_DESCRIPTIVE_COMPLETION}) {
       if ($shell eq 'bash') {
         print _bash_completion_script(@_);
@@ -862,9 +865,16 @@ sub _completion_for_zsh {
   return @args;
 }
 
+sub _completion_names {
+  if (my $names = $ENV{GETOPT_LONG_DESCRIPTIVE_COMPLETION_NAME}) {
+    return split /,/, $names;
+  }
+  return prog_name();
+}
+
 sub _bash_completion_script {
-  my $prog = prog_name();
-  (my $fn_name = "_${prog}_completion") =~ s/[^a-zA-Z0-9_]/_/g;
+  my @names = _completion_names();
+  (my $fn_name = "_$names[0]_completion") =~ s/[^a-zA-Z0-9_]/_/g;
 
   my $data = _completion_for_bash(@_);
 
@@ -888,18 +898,18 @@ sub _bash_completion_script {
   my $flags = $data->{flags};
   $script  .= "    COMPREPLY=(\$(compgen -W \"$flags\" -- \"\$cur\"))\n";
   $script  .= "}\n";
-  $script  .= "complete -F $fn_name $prog\n";
+  $script  .= "complete -F $fn_name $_\n" for @names;
 
   return $script;
 }
 
 sub _zsh_completion_script {
-  my $prog = prog_name();
-  (my $fn_name = "_$prog") =~ s/[^a-zA-Z0-9_]/_/g;
+  my @names = _completion_names();
+  (my $fn_name = "_$names[0]") =~ s/[^a-zA-Z0-9_]/_/g;
 
   my @args = _completion_for_zsh(@_);
 
-  my $script  = "#compdef $prog\n";
+  my $script  = "#compdef " . join(' ', @names) . "\n";
   $script    .= "$fn_name() {\n";
   $script    .= "    local -a arguments\n";
   $script    .= "    arguments=(\n";
