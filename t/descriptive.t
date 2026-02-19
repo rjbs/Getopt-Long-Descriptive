@@ -513,4 +513,20 @@ subtest "descriptions for option value types" => sub {
   ok(!$Getopt::Long::gnu_compat, "Getopt::Long::gnu_compat still false after getopt");
 }
 
+subtest "completion skips non-option specs" => sub {
+  my @specs = (
+    [ 'foo',              'a foo option'     ],
+    [ 'This is just text'                    ],  # single plain-string entry
+    [],                                          # blank spacer
+    [ \'verbatim text'                       ],  # scalar-ref verbatim entry
+    [ 'bar',              'a bar option'     ],
+  );
+
+  my $bash = Getopt::Long::Descriptive::_completion_for_bash(@specs);
+  is($bash->{flags}, '--foo --bar', 'bash completion flags omit non-option specs');
+
+  my @zsh = Getopt::Long::Descriptive::_completion_for_zsh(@specs);
+  is(scalar @zsh, 2, 'zsh completion has one entry per real option');
+};
+
 done_testing;

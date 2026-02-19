@@ -271,7 +271,7 @@ BEGIN {
 use Sub::Exporter::Util ();
 use Sub::Exporter 0.972 -setup => {
   exports => [
-    describe_options => \'_build_describe_options',
+    describe_options  => \'_build_describe_options',
     q(prog_name),
     @{ $Params::Validate::EXPORT_TAGS{types} }
   ],
@@ -684,6 +684,166 @@ sub _mk_implies {
 
 sub _mk_only_one {
   die "unimplemented";
+}
+
+# Parse the opt_spec list (same format as describe_options) into a list of
+# hashrefs suitable for generating completion data.  Hidden and spacer entries
+# are omitted.  one_of grouping options are transparent: the outer option is
+# skipped and its sub-options are included in its place.
+sub _parse_specs_for_completion {
+  pop if ref $_[-1] eq 'HASH';
+  my @parsed;
+
+  for my $opt (_expand(@_)) {
+    next if $opt->{desc} eq 'spacer';  # skip spacers and display-only text entries
+
+    my $constraint = $opt->{constraint};
+
+    # one_of comes in two forms:
+    #   Form 1: [ 'group', [ [inner specs...] ] ]   -- desc is the arrayref
+    #   Form 2: [ 'group', 'desc', { one_of => [...] } ]  -- explicit constraint
+    # In both cases suppress the outer option and recurse into the sub-options.
+    if (ref($opt->{desc}) eq 'ARRAY') {
+      push @parsed, _parse_specs_for_completion(@{ $opt->{desc} });
+      next;
+    }
+
+    if (ref($constraint->{one_of}) eq 'ARRAY') {
+      push @parsed, _parse_specs_for_completion(@{ $constraint->{one_of} });
+      next;
+    }
+
+    next if $constraint->{hidden} || ($opt->{desc} // '') eq 'hidden';
+
+    my ($names_str, $assignment) = __PACKAGE__->_strip_assignment($opt->{spec});
+
+    push @parsed, {
+      names       => [ split /\|/, $names_str ],
+      takes_value => !!($assignment =~ /\A[:=]/),
+      negatable   => !!($assignment =~ /\A!/),
+      desc        => $opt->{desc},
+      completion  => $constraint->{completion},
+    };
+  }
+
+  return @parsed;
+}
+
+sub _bash_completion_action {
+  my ($completion) = @_;
+
+  if (ref $completion eq 'ARRAY') {
+    return undef unless @$completion;
+    my $vals = join q{ }, @$completion;
+    return qq{COMPREPLY=(\$(compgen -W "$vals" -- "\$cur"))};
+  }
+
+  return q{COMPREPLY=($(compgen -f -- "$cur"))} if $completion eq 'files';
+  return q{COMPREPLY=($(compgen -d -- "$cur"))} if $completion eq 'dirs';
+
+  if ($completion =~ /\Afn:(.+)\z/) {
+    return qq{COMPREPLY=(\$($1 "\$cur"))};
+  }
+
+  return undef;
+}
+
+sub _zsh_completion_action {
+  my ($completion) = @_;
+
+  return '_files'    if $completion eq 'files';
+  return '_files -/' if $completion eq 'dirs';
+
+  if (ref $completion eq 'ARRAY') {
+    return '(' . join(' ', @$completion) . ')';
+  }
+
+  if ($completion =~ /\Afn:(.+)\z/) {
+    return $1;
+  }
+
+  return '';
+}
+
+# _completion_for_bash(\@opt_spec)
+#
+# Given an @opt_spec in the same format as describe_options, returns a hashref
+# describing bash completion for those options.
+#
+# The 'flags' key holds a space-separated string of all option flags, suitable
+# for passing to compgen -W.
+#
+# The 'prev_cases' key holds an arrayref of hashrefs, each with a 'pattern'
+# (suitable for a case "$prev" arm) and an 'action' (bash code that sets
+# COMPREPLY).  Only options that carry a 'completion' key in their constraint
+# hashref produce a prev_case entry.
+#
+# The 'completion' key in an option's constraint hashref may be:
+#   - an arrayref: completes from a fixed list
+#   - 'files':     completes to file paths
+#   - 'dirs':      completes to directory paths
+#   - 'fn:NAME':   delegates to the named shell function; $cur is available
+#                  in the environment
+sub _completion_for_bash {
+  my (@specs) = @_;
+
+  my @flags;
+  my @prev_cases;
+
+  for my $p (_parse_specs_for_completion(@specs)) {
+    for my $name (@{ $p->{names} }) {
+      push @flags, length($name) == 1 ? "-$name" : "--$name";
+      push @flags, "--no-$name" if $p->{negatable} && length($name) > 1;
+    }
+
+    if ($p->{takes_value} && defined $p->{completion}) {
+      my $action = _bash_completion_action($p->{completion});
+      if (defined $action) {
+        my $pattern = join '|',
+          map { length($_) == 1 ? "-$_" : "--$_" } @{ $p->{names} };
+        push @prev_cases, { pattern => $pattern, action => $action };
+      }
+    }
+  }
+
+  return {
+    flags      => join(' ', @flags),
+    prev_cases => \@prev_cases,
+  };
+}
+
+# _completion_for_zsh(@opt_spec)
+#
+# Given an @opt_spec in the same format as describe_options, returns a list of
+# strings in _arguments spec format for use in a zsh completion function.
+# Each string describes one option flag.  The 'completion' constraint key is
+# supported with the same values as _completion_for_bash.
+sub _completion_for_zsh {
+  my (@specs) = @_;
+
+  my @args;
+  for my $p (_parse_specs_for_completion(@specs)) {
+    my $safe_desc = $p->{desc} // '';
+    $safe_desc =~ s/\[/\\[/g;
+    $safe_desc =~ s/\]/\\]/g;
+    $safe_desc =~ s/'/'\\''/g;
+
+    for my $name (@{ $p->{names} }) {
+      my $flag = length($name) == 1 ? "-$name" : "--$name";
+      if ($p->{takes_value}) {
+        my $action = defined $p->{completion}
+          ? _zsh_completion_action($p->{completion})
+          : '';
+        push @args, qq('${flag}=[${safe_desc}]: :${action}');
+      } else {
+        push @args, qq('${flag}[${safe_desc}]');
+      }
+      push @args, qq('--no-${name}[disable ${name}]')
+        if $p->{negatable} && length($name) > 1;
+    }
+  }
+
+  return @args;
 }
 
 {
