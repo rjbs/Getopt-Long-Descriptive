@@ -105,7 +105,7 @@ is_opt(
 ### tests for one_of
 
 my $foobar = [
-  [ 'foo' => 'a foo option' ],
+  [ 'foo-foo' => 'a foo option' ],
   [ 'bar' => 'a bar option' ],
 ];
 
@@ -113,10 +113,10 @@ is_opt(
   [ ],
   [
     [
-      mode => $foobar, { default => 'foo' },
+      mode => $foobar, { default => 'foo-foo' },
     ],
   ],
-  { mode => 'foo' },
+  { mode => 'foo-foo' },
   "basic usage, with default",
 );
 
@@ -150,7 +150,7 @@ is_hidden(
 );
 
 is_opt(
-  [ '--foo', '--bar' ],
+  [ '--foo-foo', '--bar' ],
   [ [ mode => $foobar ] ],
   #qr/\Qonly one 'mode' option (foo, bar)\E/,
   qr/options conflict/,

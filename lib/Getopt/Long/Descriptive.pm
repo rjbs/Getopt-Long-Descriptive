@@ -506,6 +506,7 @@ sub _build_describe_options {
       next if $newopt eq $opt;
       $return{$newopt} = delete $return{$opt};
     }
+    my @munged_keys = keys %return;
 
     # ensure that shortcircuit options are handled first
     for my $copt (
@@ -522,7 +523,7 @@ sub _build_describe_options {
         spec   => $copt->{constraint},
         opts   => \@opts,
         usage  => $usage,
-        given_keys => \@given_keys,
+        munged_keys => \@munged_keys,
         parent_of  => \%parent_of,
       );
       next unless defined $new || exists $return{$name};
@@ -558,7 +559,7 @@ sub _validate_with {
     spec   => 1,
     opts   => 1,
     usage  => 1,
-    given_keys => 1,
+    munged_keys => 1,
     parent_of  => 1,
   });
 
@@ -610,7 +611,7 @@ sub _validate_with {
     %p = validate_with(
       params => [
         %{$arg{params}},
-        '-given_keys', $arg{given_keys},
+        '-munged_keys', $arg{munged_keys},
         '-parent_of',  $arg{parent_of},
       ],
       spec   => { $arg{name} => \%pvspec },
@@ -678,7 +679,7 @@ sub _mk_implies {
       my @siblings = $parent
                    ? (grep {; defined $rest->{'-parent_of'}{$_}
                               && $rest->{'-parent_of'}{$_} eq $parent }
-                      @{ $rest->{'-given_keys'} })
+                      @{ $rest->{'-munged_keys'} })
                    : ();
 
       if (@siblings > 1) {
@@ -687,7 +688,7 @@ sub _mk_implies {
 
       if (  exists $param->{$key}
         and $param->{$key} ne $val
-        and grep {; $_ eq $key } @{ $rest->{'-given_keys'} }
+        and grep {; $_ eq $key } @{ $rest->{'-munged_keys'} }
       ) {
         die(
           "option specification for $name implies that $key should be "
